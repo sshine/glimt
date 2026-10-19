@@ -1,0 +1,15 @@
+[package]
+name = "glimt-cal"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Danish calendar model: ISO weeks, month columns and holidays"
+
+[lints]
+workspace = true
+
+[dependencies]
+chrono = { workspace = true, features = ["clock", "std"] }

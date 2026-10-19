@@ -1,0 +1,112 @@
+//! The style sheet, generated from the shared theme.
+//!
+//! Written out of the same constants the other candidate paints from, rather than
+//! copied into a `.css` file, because a colour that differs between the two candidates
+//! would read as a rendering difference when comparing screenshots.
+//!
+//! The backdrop goes on a widget this project owns rather than on the window. Putting
+//! it on the window leaves the drawing at the mercy of whichever Adwaita variant the
+//! session happens to be in, and this session is dark.
+
+use glimt_shell::theme;
+
+pub fn sheet() -> String {
+    let ink = theme::INK.hex();
+    let muted = theme::MUTED.hex();
+    let shade = theme::SHADE.hex();
+    let rule = theme::RULE.hex();
+    let accent = theme::ACCENT.hex();
+    let selection = theme::SELECTION.hex();
+    let background = theme::BACKGROUND.hex();
+    let past_fill = theme::PAST_FILL.hex();
+    let past_ink = theme::PAST_INK.hex();
+    let today_ink = theme::TODAY_INK.hex();
+    let future_fill = theme::FUTURE_FILL.hex();
+    let future_border = theme::FUTURE_BORDER.hex();
+    let bar_fill = theme::BAR_FILL.hex();
+    let faded = theme::FADED.hex();
+
+    let font = theme::FONT;
+    let heading = theme::WEEK_HEADING_SIZE;
+    let initial = theme::SQUARE_INITIAL_SIZE;
+    let number = theme::SQUARE_NUMBER_SIZE;
+    let month_heading = theme::MONTH_HEADING_SIZE;
+    let month_row = theme::MONTH_ROW_SIZE;
+    let holiday = theme::HOLIDAY_SIZE;
+    let radius = theme::SQUARE_RADIUS;
+    let ring = theme::SELECTION_RING;
+    let bar_text = theme::BAR_TEXT_SIZE;
+    let bar_note = theme::BAR_NOTE_SIZE;
+    let bar_radius = theme::BAR_RADIUS;
+    let pad = theme::PAD;
+    let alpha = f64::from(theme::HIGHLIGHT_ALPHA) / 255.0;
+    let (hr, hg, hb) = (theme::HIGHLIGHT.0, theme::HIGHLIGHT.1, theme::HIGHLIGHT.2);
+
+    format!(
+        "
+window.glimt {{ background-color: {background}; font-family: {font}; }}
+.glimt-root  {{ background-color: {background}; color: {ink}; padding: {pad}px; }}
+
+.week-heading {{ font-size: {heading}px; font-weight: 800; color: {ink}; }}
+
+.day          {{ border-radius: {radius}px; }}
+.day-initial  {{ font-size: {initial}px; font-weight: 700; letter-spacing: 1px; }}
+.day-number   {{ font-size: {number}px;  font-weight: 800; }}
+
+.day.past   {{ background-color: {past_fill}; }}
+.day.past label {{ color: {past_ink}; }}
+
+.day.today  {{ background-color: {accent}; }}
+.day.today label {{ color: {today_ink}; }}
+
+.day.future {{ background-color: {future_fill}; border: 1px solid {future_border}; }}
+.day.future label {{ color: {ink}; }}
+
+/* The day the keyboard is on, which is not always today. */
+.day.selected {{ outline: {ring}px solid {selection}; outline-offset: -{ring}px; }}
+.day.highlighted {{ background-image: linear-gradient(rgba({hr}, {hg}, {hb}, {alpha}),
+                                                   rgba({hr}, {hg}, {hb}, {alpha})); }}
+
+.month          {{ border-left: 1px solid {rule}; }}
+.month-heading  {{ font-size: {month_heading}px; font-weight: 700; color: {ink}; }}
+
+.row        {{ font-size: {month_row}px; color: {ink}; }}
+.row.shaded {{ background-color: {shade}; }}
+.row .week  {{ font-weight: 700; }}
+.row .holiday {{ font-size: {holiday}px; color: {muted}; }}
+
+/* A flat gradient rather than a background colour, because background-image paints over
+   background-color: a highlighted weekend keeps its grey underneath. An inset box-shadow
+   would do the same thing but collides with the one the selected row uses, and the two
+   cannot both win. */
+.row.highlighted {{ background-image: linear-gradient(rgba({hr}, {hg}, {hb}, {alpha}),
+                                                   rgba({hr}, {hg}, {hb}, {alpha})); }}
+.row.selected {{ box-shadow: inset {ring}px 0 0 0 {selection}; }}
+
+/* The reference draws one box around the whole run of seven rows, so the sides are on
+   every row of it and the ends carry the cap. */
+.row.focus        {{ border-left: 2px solid {accent}; border-right: 2px solid {accent}; }}
+.row.focus-first  {{ border-top: 2px solid {accent}; }}
+.row.focus-last   {{ border-bottom: 2px solid {accent}; }}
+
+.bar        {{ background-color: {bar_fill}; border-radius: {bar_radius}px;
+               padding: 0 14px; }}
+.bar-input  {{ font-size: {bar_text}px; color: {ink}; }}
+.bar-result {{ font-size: {bar_text}px; font-weight: 700; color: {ink}; }}
+.bar-result.faded {{ color: {faded}; font-weight: 400; }}
+.bar-result.problem {{ font-size: {bar_note}px; font-weight: 400; color: {muted}; }}
+.bar-note   {{ font-size: {bar_note}px; color: {muted}; }}
+"
+    )
+}
+
+/// The fullscreen shape: a translucent backdrop with the dashboard as a card on it.
+pub fn overlay_sheet() -> String {
+    format!(
+        "
+window.glimt.overlay {{ background-color: rgba(0, 0, 0, 0.35); }}
+.card {{ background-color: {}; border-radius: 14px; }}
+",
+        theme::BACKGROUND.hex()
+    )
+}

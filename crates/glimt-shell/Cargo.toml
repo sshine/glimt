@@ -1,0 +1,25 @@
+[package]
+name = "glimt-shell"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Daemon lifecycle, triggering and latency recording, shared by both spikes"
+
+[lints]
+workspace = true
+
+[dependencies]
+glimt-cal = { workspace = true }
+napkin-math = { workspace = true }
+
+anyhow = { workspace = true }
+chrono = { workspace = true, features = ["clock", "std"] }
+libc = { workspace = true }
+serde = { workspace = true, features = ["derive", "std"] }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+zbus = { workspace = true }

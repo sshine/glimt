@@ -1,0 +1,26 @@
+[package]
+name = "spike-raw"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Candidate B: the dashboard drawn into shared memory with tiny-skia and cosmic-text"
+
+[lints]
+workspace = true
+
+[dependencies]
+glimt-cal = { workspace = true }
+napkin-math = { workspace = true }
+glimt-shell = { workspace = true }
+
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+cosmic-text = { workspace = true }
+smithay-client-toolkit = { workspace = true }
+tiny-skia = { workspace = true }
+tracing = { workspace = true }
+wayland-client = { workspace = true }
+wayland-protocols = { workspace = true, features = ["client"] }

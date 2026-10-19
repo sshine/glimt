@@ -1,0 +1,19 @@
+[package]
+name = "glimtctl"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Drive a running glimt daemon over the session bus"
+
+[lints]
+workspace = true
+
+[dependencies]
+glimt-shell = { workspace = true }
+
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+zbus = { workspace = true }

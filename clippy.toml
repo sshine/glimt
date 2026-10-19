@@ -1,0 +1,8 @@
+# `.expect()` carries a message saying what was assumed, which is exactly what a failing
+# test should print. Outside tests it is still denied, because there the message is a
+# crash rather than an assertion.
+#
+# `.unwrap()` stays denied everywhere, tests included: a panic with no explanation is
+# the same unhelpful failure wherever it happens.
+allow-expect-in-tests = true
+allow-unwrap-in-tests = false

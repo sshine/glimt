@@ -1,0 +1,22 @@
+[package]
+name = "glimt-bench"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Drive a candidate through many shows and report what it cost"
+
+[lints]
+workspace = true
+
+[dependencies]
+glimt-shell = { workspace = true }
+
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+libc = { workspace = true }
+serde = { workspace = true, features = ["derive", "std"] }
+serde_json = { workspace = true }
+zbus = { workspace = true }

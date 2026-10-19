@@ -1,0 +1,26 @@
+[package]
+name = "spike-gtk4"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Candidate A: the dashboard drawn with GTK4, Pango and GSK"
+
+[lints]
+workspace = true
+
+[dependencies]
+glimt-cal = { workspace = true }
+napkin-math = { workspace = true }
+glimt-shell = { workspace = true }
+
+anyhow = { workspace = true }
+async-channel = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+gdk4 = { workspace = true }
+glib = { workspace = true }
+gtk4 = { workspace = true, features = ["v4_12"] }
+gtk4-layer-shell = { workspace = true }
+tracing = { workspace = true }

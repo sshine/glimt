@@ -1,0 +1,10 @@
+# rust-lld, which rustc uses by default on x86_64 Linux, crashes while linking
+# spike-raw: it prints an LLVM stack dump and asks for a bug report. The binary
+# statically links the Scheme runtime, cranelift, rustls and the whole Wayland and text
+# stack, and something in that combination it cannot do. The GNU linker links the same
+# objects without complaint.
+#
+# Set for the target rather than for the one crate because cargo has no way to say the
+# latter. The cost is a slower link for everything else.
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "link-arg=-fuse-ld=bfd"]

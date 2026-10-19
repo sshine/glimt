@@ -1,0 +1,21 @@
+[package]
+name = "napkin-math"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "A napkin calculator: infix arithmetic, currency and dates, evaluated in Scheme"
+
+[lints]
+workspace = true
+
+[dependencies]
+glimt-cal = { workspace = true }
+
+chrono = { workspace = true, features = ["clock", "std"] }
+roxmltree = { workspace = true }
+scheme-rs = { workspace = true }
+tracing = { workspace = true }
+ureq = { workspace = true }
