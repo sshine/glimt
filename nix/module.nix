@@ -80,11 +80,15 @@
 
         shortcut = lib.mkOption {
           type = lib.types.nullOr lib.types.str;
-          default = "<Super>space";
+          default = "<Super>Return";
           example = "<Super>k";
           description = ''
             The key that shows the dashboard, in GNOME's own notation. Null leaves the
             keyboard alone, which is what you want alongside `portal`.
+
+            Not Super+space, which looks like the obvious choice and is GNOME's own
+            binding for switching input sources: on a machine with two keyboard layouts
+            it is already taken.
           '';
         };
 
@@ -100,7 +104,7 @@
 
         trigger = lib.mkOption {
           type = lib.types.str;
-          default = "SUPER+space";
+          default = "SUPER+Return";
           description = ''
             The shortcut to ask the portal for, in the portal's notation rather than
             GNOME's. A preference: the portal's own settings win.

@@ -119,16 +119,18 @@ And in a module of your own:
 ```
 
 That installs `glimt` and `glimtctl`, runs the daemon as a user service bound to
-`graphical-session.target`, and binds `<Super>space` to `glimtctl toggle` through dconf.
+`graphical-session.target`, and binds `<Super>Return` to `glimtctl toggle` through dconf.
+Not Super+space: that is GNOME's own binding for switching input sources, and is already
+taken on any machine with two keyboard layouts.
 The options:
 
 | Option | Default | |
 | --- | --- | --- |
 | `package` | `pkgs.glimt` | `pkgs.glimt-raw` for the other frontend |
-| `shortcut` | `<Super>space` | GNOME's notation; null leaves the keyboard alone |
+| `shortcut` | `<Super>Return` | GNOME's notation; null leaves the keyboard alone |
 | `months` | `6` | a count that divides the year aligns to its block |
 | `portal` | `false` | register the shortcut through the portal instead |
-| `trigger` | `SUPER+space` | what to ask the portal for, in its notation |
+| `trigger` | `SUPER+Return` | what to ask the portal for, in its notation |
 | `extraArgs` | `[ ]` | anything else for the daemon's command line |
 
 **If the key does nothing**, it is almost certainly this: GNOME keeps every custom
