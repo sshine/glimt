@@ -290,7 +290,7 @@ fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layou
 
     text.draw(
         pixmap,
-        bar.input,
+        &caret(bar),
         Area::new(
             theme::PAD + inset,
             layout.bar_top,
@@ -634,4 +634,15 @@ fn row_height(window_height: f32, rows_top: f32) -> f32 {
     let available = (window_height - rows_top - theme::PAD) / LONGEST_MONTH;
 
     available.clamp(10.0, theme::MONTH_ROW_HEIGHT)
+}
+
+/// What has been typed, with the caret after it when it is showing.
+///
+/// Appended rather than drawn beside, so the text in front of it does not shift as it
+/// blinks, and so both frontends put exactly the same glyph in the same place.
+fn caret(bar: &Bar<'_>) -> String {
+    match bar.cursor {
+        true => format!("{}{}", bar.input, theme::CURSOR),
+        false => bar.input.to_owned(),
+    }
 }

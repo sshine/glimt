@@ -4,7 +4,7 @@ A resident dashboard for Linux that appears on a key press, in the shape of Rayc
 one process that stays in memory with its window built, so showing it is a map rather
 than a start.
 
-![The dashboard](docs/img/spike-raw.png)
+![The dashboard](docs/img/glimt-raw.png)
 
 It shows a calendar taken from [ugenr.dk] and a napkin calculator. The calendar is the
 current week as seven coloured weekday boxes with its week number beside them, and a
@@ -51,18 +51,24 @@ The parser is Rust and the semantics are Scheme. `crates/napkin-math/src/prelude
 holds the value model and the dispatch of the four operators across numbers, amounts,
 dates and durations, which is where another kind of napkin calculation would go.
 
-## The two candidates
+## The two frontends
 
 | Crate | Stack |
 | --- | --- |
-| `crates/spike-gtk4` | GTK4 with Pango, GSK and a style sheet |
-| `crates/spike-raw` | smithay-client-toolkit, tiny-skia and cosmic-text, no toolkit |
+| `crates/glimt` | GTK4 with Pango, GSK and a style sheet |
+| `crates/glimt-raw` | smithay-client-toolkit, tiny-skia and cosmic-text, no toolkit |
+
+`glimt` is what ships and what the NixOS module installs. `glimt-raw` is kept, not
+deprecated: it is the control that says what the compositor's own floor is, so a later
+regression in the GTK one can be told apart from a change in mutter, and it is the only
+one of the two that can take a layer surface without a C library in the way.
 
 Both are kept in step. Everything except the drawing is shared, so a feature is written
 once and drawn twice: `glimt-cal` holds the calendar as data, `napkin-math` the
 calculator, and `glimt-shell` the daemon, the D-Bus service, the global shortcut, the
-design tokens and the state machine that says what a key does. Each frontend translates
-its own key events into that vocabulary and renders the result.
+design tokens and the state machine that says what a key does, and `glimt-proto` the
+three names a client needs. Each frontend translates its own key events into that
+vocabulary and renders the result.
 
 The comparison and its numbers are in [docs/graphics-stack-decision.md].
 
@@ -84,20 +90,75 @@ Two consequences shape both candidates:
   `just nested` checks that under a nested wlroots compositor on its headless backend,
   without leaving GNOME and without taking the screen.
 
+## Installing on NixOS
+
+The flake exports a NixOS module that does the two things that are not obvious from the
+outside: it keeps the daemon running for the life of the graphical session, and it binds
+a key to it.
+
+As an input:
+
+```nix
+glimt.url = "github:sshine/glimt";
+glimt.inputs.nixpkgs.follows = "nixpkgs";
+glimt.inputs.flake-parts.follows = "flake-parts";
+glimt.inputs.import-tree.follows = "import-tree";
+```
+
+And in a module of your own:
+
+```nix
+{ inputs, ... }:
+{
+  flake.nixosModules.glimt = {
+    imports = [ inputs.glimt.nixosModules.default ];
+
+    services.glimt.enable = true;
+  };
+}
+```
+
+That installs `glimt` and `glimtctl`, runs the daemon as a user service bound to
+`graphical-session.target`, and binds `<Super>space` to `glimtctl toggle` through dconf.
+The options:
+
+| Option | Default | |
+| --- | --- | --- |
+| `package` | `pkgs.glimt` | `pkgs.glimt-raw` for the other frontend |
+| `shortcut` | `<Super>space` | GNOME's notation; null leaves the keyboard alone |
+| `months` | `6` | a count that divides the year aligns to its block |
+| `portal` | `false` | register the shortcut through the portal instead |
+| `trigger` | `SUPER+space` | what to ask the portal for, in its notation |
+| `extraArgs` | `[ ]` | anything else for the daemon's command line |
+
+**If the key does nothing**, it is almost certainly this: GNOME keeps every custom
+keybinding in one dconf list. The module sets that list as a system default, and a user
+who has ever added a custom shortcut through Settings has a list of their own in
+`~/.config/dconf/user` that shadows it. Either add the binding by hand once, or set
+`services.glimt.portal = true` and `shortcut = null`, which makes glimt register the
+shortcut itself through the GlobalShortcuts portal. GNOME then asks once, in a dialog,
+and remembers. The portal is also the only one of the two whose key press carries an
+activation token, which is what mutter wants before it will hand a window the keyboard,
+so it is worth switching to if the window comes up without focus.
+
+The module is checked on every build: `nix build .#checks.<system>.module` evaluates a
+system with it enabled and writes out the service command and the dconf keys, because
+nothing else type-checks a module until someone rebuilds their machine.
+
 ## Running it
 
 ```sh
 nix develop          # or: direnv allow
 just dev             # the GTK candidate, visible
-just dev spike-raw   # the other one
+just dev glimt-raw   # the other one
 
-just dev spike-raw --input "13 usd in dkk"   # with something already typed
+just dev glimt-raw --input "13 usd in dkk"   # with something already typed
 ```
 
 As a daemon, which is how it is meant to run:
 
 ```sh
-just daemon spike-gtk4   # registers SUPER+space through the portal
+just daemon glimt   # registers SUPER+space through the portal
 just toggle              # or drive it by hand
 ```
 

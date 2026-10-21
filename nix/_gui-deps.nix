@@ -1,8 +1,8 @@
-# Native dependencies for the two spikes, in one place.
+# Native dependencies for the two frontends, in one place.
 #
 # Underscore-prefixed so import-tree skips it: it is a plain function, not a flake-parts
 # module. The dev shell and both package builds import it, so they cannot disagree about
-# which GTK or which Wayland the spikes are built against. A disagreement there would
+# which GTK or which Wayland the frontends are built against. A disagreement there would
 # show up as a difference in the benchmark numbers and be read as a property of the
 # toolkit.
 #
@@ -46,8 +46,8 @@ pkgs: rec {
   # What each candidate alone needs. Handing both of them the union would put GTK in
   # the raw candidate.s closure and make the two sizes meaningless.
   crateInputs = {
-    spike-gtk4 = gtkLibs ++ fontLibs;
-    spike-raw = waylandLibs ++ fontLibs;
+    glimt = gtkLibs ++ fontLibs;
+    glimt-raw = waylandLibs ++ fontLibs;
   };
 
   # The dev shell builds both, so it gets the union.

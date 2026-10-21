@@ -62,6 +62,9 @@ pub struct Bar<'a> {
     /// whole of how an unfinished expression is reported: by saying nothing and letting
     /// the previous answer go quiet.
     pub faded: bool,
+    /// Whether the caret is showing this instant. It blinks while the window is up and
+    /// is held solid while keys are arriving, the way a text field does.
+    pub cursor: bool,
     /// An expression that parsed and could not be worked out. One quiet line, and only
     /// when there is genuinely something to say.
     pub problem: Option<&'a str>,
@@ -75,6 +78,7 @@ pub struct AppState {
     answer: Option<Answer>,
     problem: Option<String>,
     faded: bool,
+    cursor: bool,
     /// The range a duration is pointing at, which the grid paints.
     highlight: Option<(NaiveDate, NaiveDate)>,
     overview: Overview,
@@ -99,6 +103,7 @@ impl AppState {
             answer: None,
             problem: None,
             faded: false,
+            cursor: true,
             highlight: None,
             overview: Overview::new(View::on(today), months),
             napkin,
@@ -122,6 +127,7 @@ impl AppState {
             input: &self.input,
             answer: self.answer.as_ref(),
             faded: self.faded,
+            cursor: self.cursor,
             problem: self.problem.as_deref(),
         }
     }
@@ -161,15 +167,32 @@ impl AppState {
         true
     }
 
+    /// Flip the caret. Called on a timer while the window is up, and not while it is
+    /// down: a hidden dashboard that wakes twice a second to blink at nobody would show
+    /// up in the idle measurement as costing something.
+    pub fn blink(&mut self) -> bool {
+        self.cursor = !self.cursor;
+        true
+    }
+
+    /// Hold the caret on, which is what a text field does while keys are arriving: a
+    /// caret that blinks out mid-word reads as a dropped keystroke.
+    fn hold_cursor(&mut self) {
+        self.cursor = true;
+    }
+
     pub fn apply(&mut self, action: Action) -> Response {
         match action {
             Action::Type(character) => {
+                self.hold_cursor();
                 self.input.push(character);
                 self.recompute();
                 Response::Redraw
             }
 
             Action::Backspace => {
+                self.hold_cursor();
+
                 if self.input.pop().is_none() {
                     return Response::Ignored;
                 }

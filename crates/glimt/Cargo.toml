@@ -1,12 +1,12 @@
 [package]
-name = "spike-gtk4"
+name = "glimt"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
-description = "Candidate A: the dashboard drawn with GTK4, Pango and GSK"
+description = "A resident calendar dashboard with a napkin calculator, drawn with GTK4"
 
 [lints]
 workspace = true

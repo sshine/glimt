@@ -12,7 +12,7 @@ description = "Drive a running glimt daemon over the session bus"
 workspace = true
 
 [dependencies]
-glimt-shell = { workspace = true }
+glimt-proto = { workspace = true }
 
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive"] }

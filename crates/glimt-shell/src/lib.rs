@@ -14,7 +14,7 @@ pub mod service;
 pub mod state;
 pub mod theme;
 
-pub use service::{BUS_NAME, INTERFACE, OBJECT_PATH, serve};
+pub use service::serve;
 pub use state::{Action, AppState, Bar, Response};
 
 /// What the worker asks the toolkit's loop to do.
@@ -39,36 +39,7 @@ pub enum Command {
     Rates(Box<napkin_math::Rates>),
 }
 
-/// One show, from the request arriving to the compositor saying it is on screen.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
-pub struct Sample {
-    pub requested_at: i64,
-    pub presented_at: i64,
-    /// Microseconds between the two, which is the headline number.
-    pub latency_us: i64,
-}
-
-/// CLOCK_MONOTONIC in microseconds.
-///
-/// Both candidates report presentation against this clock: GTK's frame timings come
-/// from `g_get_monotonic_time`, and `wp_presentation` reports whichever clock it
-/// advertises, which is CLOCK_MONOTONIC on every compositor that implements it. Using
-/// `Instant` instead would be the same clock with no way to subtract the compositor's
-/// timestamp from it.
-pub fn monotonic_us() -> i64 {
-    let mut ts = libc::timespec {
-        tv_sec: 0,
-        tv_nsec: 0,
-    };
-
-    // SAFETY: clock_gettime writes to the timespec it is given and nothing else.
-    // CLOCK_MONOTONIC is always available on Linux.
-    unsafe {
-        libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts);
-    }
-
-    ts.tv_sec * 1_000_000 + ts.tv_nsec / 1_000
-}
+pub use glimt_proto::{BUS_NAME, INTERFACE, OBJECT_PATH, Sample, monotonic_us};
 
 /// Collected shows, drained by the benchmark over D-Bus.
 #[derive(Debug, Clone, Default)]

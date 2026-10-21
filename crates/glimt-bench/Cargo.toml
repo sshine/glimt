@@ -12,7 +12,7 @@ description = "Drive a candidate through many shows and report what it cost"
 workspace = true
 
 [dependencies]
-glimt-shell = { workspace = true }
+glimt-proto = { workspace = true }
 
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive"] }

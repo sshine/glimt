@@ -1,12 +1,12 @@
 [package]
-name = "spike-raw"
+name = "glimt-raw"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
-description = "Candidate B: the dashboard drawn into shared memory with tiny-skia and cosmic-text"
+description = "The same dashboard with no toolkit under it, kept as the control"
 
 [lints]
 workspace = true

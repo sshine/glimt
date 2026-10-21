@@ -28,7 +28,10 @@ use smithay_client_toolkit::{
     delegate_registry,
     output::{OutputHandler, OutputState},
     presentation_time::{PresentTime, PresentationTimeHandler, PresentationTimeState},
-    reexports::calloop::{EventLoop, channel},
+    reexports::calloop::{
+        EventLoop, LoopHandle, RegistrationToken, channel,
+        timer::{TimeoutAction, Timer},
+    },
     reexports::calloop_wayland_source::WaylandSource,
     registry::{ProvidesRegistryState, RegistryState},
     registry_handlers,
@@ -175,6 +178,11 @@ struct App {
     previous: Option<glimt_cal::Overview>,
     previous_bar: Option<BarSnapshot>,
     /// Regions in which this buffer has fallen behind the painted picture.
+    loop_handle: LoopHandle<'static, App>,
+    /// Kept so a timer callback, which is handed no queue, can still put up a frame.
+    qh: QueueHandle<App>,
+    /// The caret timer, which only runs while the window is up.
+    blink: Option<RegistrationToken>,
     /// A frame callback has been asked for and has not arrived.
     awaiting_frame: bool,
     /// Nothing can be reused: paint the lot.
@@ -264,6 +272,14 @@ fn main() -> anyhow::Result<()> {
     let pool = SlotPool::new((width * height * 4) as usize, &shm).context("shm pool")?;
     let pixmap = Pixmap::new(width, height).context("allocating the canvas")?;
 
+    // The loop comes first: the app holds a handle on it, to put the caret timer in and
+    // take it out again as the window comes and goes.
+    let mut event_loop: EventLoop<App> = EventLoop::try_new().context("the event loop")?;
+    let loop_handle = event_loop.handle();
+    WaylandSource::new(connection.clone(), event_queue)
+        .insert(loop_handle.clone())
+        .map_err(|error| anyhow::anyhow!("attaching the wayland source: {error}"))?;
+
     let recorder = Recorder::new();
     let mut app = App {
         registry_state: RegistryState::new(&globals),
@@ -284,6 +300,9 @@ fn main() -> anyhow::Result<()> {
         painted_scale: 0,
         previous: None,
         previous_bar: None,
+        loop_handle: loop_handle.clone(),
+        qh: qh.clone(),
+        blink: None,
         awaiting_frame: false,
         full: true,
         shown: false,
@@ -295,12 +314,6 @@ fn main() -> anyhow::Result<()> {
         control: false,
         exit: false,
     };
-
-    let mut event_loop: EventLoop<App> = EventLoop::try_new().context("the event loop")?;
-    let loop_handle = event_loop.handle();
-    WaylandSource::new(connection.clone(), event_queue)
-        .insert(loop_handle.clone())
-        .map_err(|error| anyhow::anyhow!("attaching the wayland source: {error}"))?;
 
     let (sender, receiver) = channel::channel();
     loop_handle
@@ -405,9 +418,47 @@ impl App {
             activation.activate::<App>(self.shell.surface(), token);
         }
 
+        self.start_blink();
+
         // A commit with no buffer is what asks for a configure, which is the only
         // point at which a surface may be given one.
         self.shell.commit();
+    }
+    /// Put up a frame from somewhere that has no queue handle of its own.
+    fn redraw_now(&mut self) {
+        let qh = self.qh.clone();
+        self.redraw(&qh);
+    }
+
+    /// Start the caret blinking, if it is not already.
+    ///
+    /// Only while the window is up: a hidden dashboard that wakes twice a second to
+    /// blink at nobody would show up in the idle measurement as costing something, and
+    /// it would be costing it for nothing.
+    fn start_blink(&mut self) {
+        if self.blink.is_some() {
+            return;
+        }
+
+        let period = std::time::Duration::from_millis(theme::CURSOR_BLINK_MS);
+        let timer = Timer::from_duration(period);
+
+        match self.loop_handle.insert_source(timer, move |_, _, app| {
+            app.state.blink();
+            // The damage diff notices the caret the same way it notices a keystroke, so
+            // this repaints the calculator band and nothing else.
+            app.redraw_now();
+            TimeoutAction::ToDuration(period)
+        }) {
+            Ok(token) => self.blink = Some(token),
+            Err(error) => tracing::warn!("no caret timer: {error}"),
+        }
+    }
+
+    fn stop_blink(&mut self) {
+        if let Some(token) = self.blink.take() {
+            self.loop_handle.remove(token);
+        }
     }
 
     fn hide(&mut self) {
@@ -415,6 +466,7 @@ impl App {
             return;
         }
 
+        self.stop_blink();
         self.shell.surface().attach(None, 0, 0);
         self.shell.surface().commit();
         self.shown = false;
@@ -746,6 +798,7 @@ struct BarSnapshot {
     input: String,
     answer: Option<glimt_shell::state::Answer>,
     faded: bool,
+    cursor: bool,
     problem: Option<String>,
 }
 
@@ -754,6 +807,7 @@ fn snapshot(bar: &glimt_shell::Bar<'_>) -> BarSnapshot {
         input: bar.input.to_owned(),
         answer: bar.answer.cloned(),
         faded: bar.faded,
+        cursor: bar.cursor,
         problem: bar.problem.map(str::to_owned),
     }
 }

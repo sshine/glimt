@@ -11,9 +11,9 @@ graphical shell out of.
 Two candidates were built, deliberately at opposite ends, both drawing the identical
 calendar from `glimt-cal` and both driven by the identical daemon in `glimt-shell`:
 
-- **A, `spike-gtk4`.** GTK4 through gtk4-rs. Pango shapes the text, GSK renders it, a
+- **A, `glimt`.** GTK4 through gtk4-rs. Pango shapes the text, GSK renders it, a
   style sheet carries the look, boxes do the layout.
-- **B, `spike-raw`.** No toolkit. smithay-client-toolkit talks Wayland, tiny-skia paints
+- **B, `glimt-raw`.** No toolkit. smithay-client-toolkit talks Wayland, tiny-skia paints
   into a shared-memory buffer, cosmic-text shapes the glyphs, and every rectangle is
   placed by arithmetic.
 
@@ -118,13 +118,13 @@ Both candidates write a PNG of exactly what they draw, so the comparison of the 
 is on pixels rather than on a compositor screenshot:
 
 ```sh
-cargo run --release -p spike-gtk4 -- --no-portal --screenshot docs/img/spike-gtk4.png
-cargo run --release -p spike-raw  -- --no-portal --screenshot docs/img/spike-raw.png
+cargo run --release -p glimt -- --no-portal --screenshot docs/img/glimt.png
+cargo run --release -p glimt-raw  -- --no-portal --screenshot docs/img/glimt-raw.png
 ```
 
-![Candidate A](img/spike-gtk4.png)
+![Candidate A](img/glimt.png)
 
-![Candidate B](img/spike-raw.png)
+![Candidate B](img/glimt-raw.png)
 
 - **Text.** Both set the Danish line under the week number correctly, ø and å included,
   from the same fontconfig family. Pango and cosmic-text differ in spacing and in how
@@ -230,7 +230,7 @@ nobody is counting. What is left is the argument that was there before, now with
 evidence under it. A fuzzy-search list, a scrolling pane and a text entry are next, and
 each one is another 10 ms on B's keystroke and another hand-built widget.
 
-`crates/spike-raw` stays, for as long as both are wanted. It earns its place twice over:
+`crates/glimt-raw` stays, for as long as both are wanted. It earns its place twice over:
 it is the control that says what the compositor's own floor is, so a later regression in
 A can be told apart from a change in mutter, and it is the only one of the two that can
 take a layer surface without a C library in the way.

@@ -68,27 +68,6 @@
         "type": "github"
       }
     },
-    "devshell_2": {
-      "inputs": {
-        "nixpkgs": [
-          "walltime",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788342953,
-        "narHash": "sha256-EWkNM4JzBhZ/Yn1PG6lP4/QJuFAFeHYlY5gVxXu940Y=",
-        "owner": "numtide",
-        "repo": "devshell",
-        "rev": "a67c0f87b63bcbdbdcb56785bec0205a2e3d6026",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "devshell",
-        "type": "github"
-      }
-    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -142,55 +121,7 @@
         "type": "github"
       }
     },
-    "hk-nix_2": {
-      "inputs": {
-        "flake-parts": [
-          "walltime",
-          "flake-parts"
-        ],
-        "import-tree": [
-          "walltime",
-          "import-tree"
-        ],
-        "nixpkgs": [
-          "walltime",
-          "nixpkgs"
-        ],
-        "treefmt-nix": [
-          "walltime",
-          "treefmt-nix"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788220061,
-        "narHash": "sha256-ePEDQQuzkyy9p0PUOTgJoOyGufjVMPcH5gKr0lHlt24=",
-        "owner": "nix-tools",
-        "repo": "hk-nix",
-        "rev": "7e7b66f7276572776eaabc1ffa0c5b1e1aa2f6dd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-tools",
-        "repo": "hk-nix",
-        "type": "github"
-      }
-    },
     "import-tree": {
-      "locked": {
-        "lastModified": 1788467110,
-        "narHash": "sha256-ljEMTXP/rH0tOvDzc9gzwww6KcHRPRnEHzd9lK48V7s=",
-        "owner": "vic",
-        "repo": "import-tree",
-        "rev": "eb1b52eaecc57f7c136d07ae8a93e724dfecac46",
-        "type": "github"
-      },
-      "original": {
-        "owner": "vic",
-        "repo": "import-tree",
-        "type": "github"
-      }
-    },
-    "import-tree_2": {
       "locked": {
         "lastModified": 1788467110,
         "narHash": "sha256-ljEMTXP/rH0tOvDzc9gzwww6KcHRPRnEHzd9lK48V7s=",
@@ -223,8 +154,7 @@
         "dendritic-base": "dendritic-base",
         "flake-parts": "flake-parts",
         "import-tree": "import-tree",
-        "nixpkgs": "nixpkgs",
-        "walltime": "walltime"
+        "nixpkgs": "nixpkgs"
       }
     },
     "rust-overlay": {
@@ -240,27 +170,6 @@
         "owner": "oxalica",
         "repo": "rust-overlay",
         "rev": "fd2ebb9cc4323d0c5a1336138dab5c3c5a5d8bd9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rust-overlay_2": {
-      "inputs": {
-        "nixpkgs": [
-          "walltime",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1789977098,
-        "narHash": "sha256-fKY4BedarKx4aR0+UOHk65hhDW8pxFytFkaUi0VYDYk=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "2776e42828203ec89511699c8dcdedec69ab98e1",
         "type": "github"
       },
       "original": {
@@ -287,55 +196,6 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "treefmt-nix_2": {
-      "inputs": {
-        "nixpkgs": [
-          "walltime",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1786901030,
-        "narHash": "sha256-WSFCsDSE5ffgD2MqzkM2CYjeFiKhRF/dJUN8uedb6YE=",
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "rev": "27b3b12a8e6375f28ebe122f07d230ca5459bbfa",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "walltime": {
-      "inputs": {
-        "devshell": "devshell_2",
-        "flake-parts": [
-          "flake-parts"
-        ],
-        "hk-nix": "hk-nix_2",
-        "import-tree": "import-tree_2",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "rust-overlay": "rust-overlay_2",
-        "treefmt-nix": "treefmt-nix_2"
-      },
-      "locked": {
-        "lastModified": 1790116675,
-        "narHash": "sha256-xZqva6+iITIbilWNW3Gl4cyz8PSrHH/Y4xa3TwL6hB4=",
-        "owner": "sshine",
-        "repo": "walltime-rs",
-        "rev": "998e526196c894e1726ba35f36c92ab7abe8762b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "sshine",
-        "repo": "walltime-rs",
         "type": "github"
       }
     }

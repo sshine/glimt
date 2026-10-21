@@ -14,6 +14,7 @@ homepage = "https://github.com/sshine/glimt"
 # needs them, since those are what differ between members.
 [workspace.dependencies]
 glimt-cal = { version = "0.1.0", path = "crates/glimt-cal" }
+glimt-proto = { version = "0.1.0", path = "crates/glimt-proto" }
 glimt-shell = { version = "0.1.0", path = "crates/glimt-shell" }
 napkin-math = { version = "0.1.0", path = "crates/napkin-math" }
 

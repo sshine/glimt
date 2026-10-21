@@ -24,13 +24,13 @@
         packages = [
           # Reading the benchmark output by hand.
           pkgs.jq
-          # Cold start timing and startup phase breakdown, so the harness only has to
-          # implement the warm show measurement.
-          pkgs.walltime
-          # The portability check runs the spikes under a nested wlroots compositor on
+          # The portability check runs the frontends under a nested wlroots compositor on
           # its headless backend, which is the only way to exercise layer-shell without
           # leaving GNOME and without taking over the screen.
           pkgs.sway
+          # Injecting key presses and capturing the result inside that nested compositor.
+          pkgs.wtype
+          pkgs.grim
           # Inspecting which Wayland protocols the compositor of the day offers.
           pkgs.wayland-utils
         ]

@@ -1296,12 +1296,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "glimt"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-channel",
+ "clap",
+ "gdk4",
+ "glib",
+ "glimt-cal",
+ "glimt-shell",
+ "gtk4",
+ "gtk4-layer-shell",
+ "napkin-math",
+ "tracing",
+]
+
+[[package]]
 name = "glimt-bench"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "glimt-shell",
+ "glimt-proto",
  "libc",
  "serde",
  "serde_json",
@@ -1316,12 +1333,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "glimt-proto"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "serde",
+]
+
+[[package]]
+name = "glimt-raw"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "cosmic-text",
+ "glimt-cal",
+ "glimt-shell",
+ "napkin-math",
+ "smithay-client-toolkit",
+ "tiny-skia",
+ "tracing",
+ "wayland-client",
+ "wayland-protocols",
+]
+
+[[package]]
 name = "glimt-shell"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
  "glimt-cal",
+ "glimt-proto",
  "libc",
  "napkin-math",
  "serde",
@@ -1337,7 +1380,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "glimt-shell",
+ "glimt-proto",
  "zbus",
 ]
 
@@ -2726,40 +2769,6 @@ name = "smol_str"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4aaa7368fcf4852a4c2dd92df0cace6a71f2091ca0a23391ce7f3a31833f1523"
-
-[[package]]
-name = "spike-gtk4"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-channel",
- "clap",
- "gdk4",
- "glib",
- "glimt-cal",
- "glimt-shell",
- "gtk4",
- "gtk4-layer-shell",
- "napkin-math",
- "tracing",
-]
-
-[[package]]
-name = "spike-raw"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "cosmic-text",
- "glimt-cal",
- "glimt-shell",
- "napkin-math",
- "smithay-client-toolkit",
- "tiny-skia",
- "tracing",
- "wayland-client",
- "wayland-protocols",
-]
 
 [[package]]
 name = "stable_deref_trait"

@@ -15,13 +15,6 @@
       inputs.flake-parts.follows = "flake-parts";
       inputs.import-tree.follows = "import-tree";
     };
-
-    # Cold start timing for both spikes. Not in nixpkgs, so it comes from its own flake.
-    walltime = {
-      url = "github:sshine/walltime-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-    };
   };
 
   outputs =

@@ -76,6 +76,10 @@ pub const BAR_NOTE_SIZE: f32 = 11.0;
 pub const FADED: Rgb = Rgb(0xa8, 0xa8, 0xa8);
 /// The prompt in front of the expression.
 pub const PROMPT: &str = "=";
+/// The caret, drawn after whatever has been typed.
+pub const CURSOR: &str = "\u{2502}";
+/// Half a blink. GTK's own default is a 1200 ms cycle; this is a little quicker.
+pub const CURSOR_BLINK_MS: u64 = 530;
 
 pub const MONTH_HEADING_SIZE: f32 = 15.0;
 pub const MONTH_ROW_SIZE: f32 = 14.0;

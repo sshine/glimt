@@ -7,7 +7,7 @@
 
 use tracing_subscriber::EnvFilter;
 
-const DEFAULT: &str = "warn,glimt_shell=info,napkin_math=info,spike_gtk4=info,spike_raw=info";
+const DEFAULT: &str = "warn,glimt_shell=info,napkin_math=info,glimt=info,glimt_raw=info";
 
 pub fn init() {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(DEFAULT));

@@ -1,4 +1,4 @@
-# Build definition shared by both spikes. Not a flake-parts module; import-tree skips
+# Build definition shared by both frontends. Not a flake-parts module; import-tree skips
 # `_`-prefixed basenames.
 #
 # Takes `pkgs` through callPackage rather than closing over this flake's own, so the
@@ -28,8 +28,7 @@ rustPlatform.buildRustPackage {
   };
   cargoLock.lockFile = ../Cargo.lock;
 
-  nativeBuildInputs =
-    if crate == "spike-gtk4" then gui.gtkNativeBuildInputs else gui.nativeBuildInputs;
+  nativeBuildInputs = if crate == "glimt" then gui.gtkNativeBuildInputs else gui.nativeBuildInputs;
   buildInputs = gui.crateInputs.${crate};
 
   cargoBuildFlags = [
@@ -37,7 +36,7 @@ rustPlatform.buildRustPackage {
     crate
   ];
 
-  # Both spikes need a compositor to do anything, and the sandbox has none.
+  # Both frontends need a compositor to do anything, and the sandbox has none.
   doCheck = false;
 
   # winit and the wayland crates dlopen rather than link, so the rpath the fixup phase

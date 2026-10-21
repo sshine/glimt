@@ -1,23 +1,29 @@
-{ inputs, ... }:
+{ inputs, lib, ... }:
 {
   imports = [ inputs.dendritic-base.flakeModules.default ];
 
   dendritic-base = {
     root = ../.;
 
-    # Puts `pkgs.walltime` in reach of the dev shell. An overlay is a function rather
-    # than a package, so it is a fact this level can hold.
-    extraOverlays = [ inputs.walltime.overlays.default ];
+    # The GTK frontend is what the dashboard is; the other is the control it is measured
+    # against. Both are built, and this is the one `nix run` and the module install.
+    rust.defaultCrate = "glimt";
 
-    # Several members produce a binary and none is named after the repository, so the
-    # default cannot be derived. glimtctl is the one a user would run by hand.
-    rust.defaultCrate = "glimtctl";
-
-    # Each crate's check otherwise runs the whole workspace's tests, which puts the two
-    # spikes' display-dependent tests in the way of the calendar crate's.
-    rust.crates.glimt-cal.extraArgs.cargoTestFlags = [
-      "--package"
-      "glimt-cal"
+    # Puts a cross linker on PATH so `just dist` can build the client for both
+    # architectures from this machine.
+    rust.release.targets = [
+      "x86_64-unknown-linux-musl"
+      "aarch64-unknown-linux-musl"
     ];
+
+    # Without this each crate's check runs the whole workspace's tests, which means a
+    # crate that depends on neither GTK nor Wayland builds both of them to test itself,
+    # and fails in the sandbox for want of a compositor.
+    rust.crates = lib.genAttrs [ "glimt-cal" "glimtctl" "glimt-bench" ] (crate: {
+      extraArgs.cargoTestFlags = [
+        "--package"
+        crate
+      ];
+    });
   };
 }

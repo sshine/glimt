@@ -19,13 +19,13 @@ use std::time::Duration;
 
 use anyhow::{Context as _, bail};
 use clap::Parser;
-use glimt_shell::{BUS_NAME, INTERFACE, OBJECT_PATH, Sample, monotonic_us};
+use glimt_proto::{BUS_NAME, INTERFACE, OBJECT_PATH, Sample, monotonic_us};
 
 #[derive(Parser)]
 #[command(version, about)]
 struct Cli {
     /// Candidate binary name, as the workspace spells it.
-    #[arg(long, default_value = "spike-gtk4")]
+    #[arg(long, default_value = "glimt")]
     candidate: String,
 
     /// Shows to perform.

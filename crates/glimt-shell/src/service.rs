@@ -11,9 +11,7 @@ use anyhow::Context as _;
 
 use crate::{Command, Recorder, Waker, monotonic_us};
 
-pub const BUS_NAME: &str = "dk.simonshine.Glimt";
-pub const OBJECT_PATH: &str = "/dk/simonshine/Glimt";
-pub const INTERFACE: &str = "dk.simonshine.Glimt1";
+pub use glimt_proto::{BUS_NAME, INTERFACE, OBJECT_PATH};
 
 struct Service {
     waker: Arc<dyn Waker>,

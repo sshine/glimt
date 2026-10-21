@@ -117,10 +117,15 @@ impl Ui {
         self.update_bar(state);
     }
 
+    /// Just the caret, for the timer that flips it twice a second.
+    pub fn update_input(&mut self, state: &AppState) {
+        self.input.set_text(&caret(&state.bar()));
+    }
+
     fn update_bar(&mut self, state: &AppState) {
         let bar = state.bar();
 
-        self.input.set_text(bar.input);
+        self.input.set_text(&caret(&bar));
 
         match (bar.problem, bar.answer) {
             (Some(problem), _) => {
@@ -358,5 +363,16 @@ fn set_class(widget: &impl IsA<gtk::Widget>, class: &str, wanted: bool) {
         widget.add_css_class(class);
     } else {
         widget.remove_css_class(class);
+    }
+}
+
+/// What has been typed, with the caret after it when it is showing.
+///
+/// Appended rather than drawn beside, so the text in front of it does not shift as it
+/// blinks, and so both frontends put exactly the same glyph in the same place.
+fn caret(bar: &glimt_shell::Bar<'_>) -> String {
+    match bar.cursor {
+        true => format!("{}{}", bar.input, theme::CURSOR),
+        false => bar.input.to_owned(),
     }
 }

@@ -132,15 +132,21 @@ fn main() -> anyhow::Result<()> {
     );
 
     let ui = Rc::new(RefCell::new(ui::Ui::build(&state.borrow())));
+
     let window = build_window(&ui.borrow(), cli.mode, cli.layer_shell);
+    let app = App {
+        window,
+        state,
+        ui,
+        timing: Rc::new(RefCell::new(Timing::default())),
+        recorder: Recorder::new(),
+        blink: Rc::new(RefCell::new(None)),
+    };
 
-    let recorder = Recorder::new();
-    let timing = Rc::new(RefCell::new(Timing::default()));
-
-    install_keys(&window, &state, &ui);
+    app.install_keys();
 
     if let Some(path) = cli.screenshot {
-        return screenshot(&window, &path);
+        return screenshot(&app.window, &path);
     }
 
     let (sender, receiver) = async_channel::unbounded();
@@ -148,7 +154,7 @@ fn main() -> anyhow::Result<()> {
 
     {
         let waker = Arc::clone(&waker);
-        let recorder = recorder.clone();
+        let recorder = app.recorder.clone();
         let trigger = (!cli.no_portal).then(|| cli.trigger.clone());
         std::thread::Builder::new()
             .name("glimt-dbus".to_owned())
@@ -169,28 +175,16 @@ fn main() -> anyhow::Result<()> {
     }
 
     {
-        let window = window.clone();
-        let state = Rc::clone(&state);
-        let ui = Rc::clone(&ui);
-        let timing = Rc::clone(&timing);
-        let recorder = recorder.clone();
+        let app = app.clone();
         glib::spawn_future_local(async move {
             while let Ok(command) = receiver.recv().await {
-                handle(&window, &state, &ui, &timing, &recorder, command);
+                app.handle(command);
             }
         });
     }
 
     if cli.visible {
-        show(
-            &window,
-            &state,
-            &ui,
-            &timing,
-            &recorder,
-            None,
-            glimt_shell::monotonic_us(),
-        );
+        app.show(None, glimt_shell::monotonic_us());
     }
 
     tracing::info!(
@@ -253,138 +247,180 @@ fn apply_layer_shell(window: &gtk::Window) {
 ///
 /// Everything this file decides about the keyboard is here: which key is which action.
 /// What an action does lives in `glimt-shell` and is the same for both candidates.
-fn install_keys(window: &gtk::Window, state: &Rc<RefCell<AppState>>, ui: &Rc<RefCell<ui::Ui>>) {
-    let keys = gtk::EventControllerKey::new();
-
-    let dismissed = window.clone();
-    let state = Rc::clone(state);
-    let ui = Rc::clone(ui);
-
-    keys.connect_key_pressed(move |_, key, _, modifiers| {
-        let control = modifiers.contains(gtk::gdk::ModifierType::CONTROL_MASK);
-
-        let action = match key {
-            gtk::gdk::Key::Escape => Action::Escape,
-            gtk::gdk::Key::q | gtk::gdk::Key::Q if control => Action::Root,
-            gtk::gdk::Key::Up if control => Action::Weeks(-1),
-            gtk::gdk::Key::Down if control => Action::Weeks(1),
-            gtk::gdk::Key::Up => Action::Days(-1),
-            gtk::gdk::Key::Down => Action::Days(1),
-            gtk::gdk::Key::BackSpace => Action::Backspace,
-            other => match other.to_unicode() {
-                // A control sequence is not text, and neither is the C0 character a
-                // bare Return or Tab arrives as.
-                Some(character) if !control && !character.is_control() => Action::Type(character),
-                _ => return glib::Propagation::Proceed,
-            },
-        };
-
-        let response = state.borrow_mut().apply(action);
-
-        match response {
-            Response::Redraw => ui.borrow_mut().update(&state.borrow()),
-            Response::Hide => dismissed.set_visible(false),
-            Response::Ignored => return glib::Propagation::Proceed,
-        }
-
-        glib::Propagation::Stop
-    });
-
-    window.add_controller(keys);
+/// Everything the callbacks need, in one place.
+///
+/// GTK hands a closure nothing, so each one has to carry what it will need, and the
+/// list had grown to six handles passed through every function that touches the window.
+/// Cloning this is cloning six reference counts.
+#[derive(Clone)]
+struct App {
+    window: gtk::Window,
+    state: Rc<RefCell<AppState>>,
+    ui: Rc<RefCell<ui::Ui>>,
+    timing: Rc<RefCell<Timing>>,
+    recorder: Recorder,
+    /// The caret timer, which runs only while the window is up.
+    blink: Rc<RefCell<Option<glib::SourceId>>>,
 }
 
-fn handle(
-    window: &gtk::Window,
-    state: &Rc<RefCell<AppState>>,
-    ui: &Rc<RefCell<ui::Ui>>,
-    timing: &Rc<RefCell<Timing>>,
-    recorder: &Recorder,
-    command: Command,
-) {
-    match command {
-        Command::Show {
-            token,
-            requested_at,
-        } => show(window, state, ui, timing, recorder, token, requested_at),
+impl App {
+    /// GTK's key events, translated into the shared vocabulary.
+    ///
+    /// Everything this file decides about the keyboard is here: which key is which
+    /// action. What an action does lives in `glimt-shell` and is the same for both
+    /// frontends.
+    fn install_keys(&self) {
+        let keys = gtk::EventControllerKey::new();
+        let app = self.clone();
 
-        Command::Hide => window.set_visible(false),
+        keys.connect_key_pressed(move |_, key, _, modifiers| {
+            let control = modifiers.contains(gtk::gdk::ModifierType::CONTROL_MASK);
 
-        Command::Toggle {
-            token,
-            requested_at,
-        } => {
-            if window.is_visible() {
-                window.set_visible(false);
-            } else {
-                show(window, state, ui, timing, recorder, token, requested_at);
+            let action = match key {
+                gtk::gdk::Key::Escape => Action::Escape,
+                gtk::gdk::Key::q | gtk::gdk::Key::Q if control => Action::Root,
+                gtk::gdk::Key::Up if control => Action::Weeks(-1),
+                gtk::gdk::Key::Down if control => Action::Weeks(1),
+                gtk::gdk::Key::Up => Action::Days(-1),
+                gtk::gdk::Key::Down => Action::Days(1),
+                gtk::gdk::Key::BackSpace => Action::Backspace,
+                other => match other.to_unicode() {
+                    // A control sequence is not text, and neither is the C0 character a
+                    // bare Return or Tab arrives as.
+                    Some(character) if !control && !character.is_control() => {
+                        Action::Type(character)
+                    }
+                    _ => return glib::Propagation::Proceed,
+                },
+            };
+
+            let response = app.state.borrow_mut().apply(action);
+
+            match response {
+                Response::Redraw => app.ui.borrow_mut().update(&app.state.borrow()),
+                Response::Hide => app.hide(),
+                Response::Ignored => return glib::Propagation::Proceed,
+            }
+
+            glib::Propagation::Stop
+        });
+
+        self.window.add_controller(keys);
+    }
+
+    fn handle(&self, command: Command) {
+        match command {
+            Command::Show {
+                token,
+                requested_at,
+            } => self.show(token, requested_at),
+
+            Command::Hide => self.hide(),
+
+            Command::Toggle {
+                token,
+                requested_at,
+            } => {
+                if self.window.is_visible() {
+                    self.hide();
+                } else {
+                    self.show(token, requested_at);
+                }
+            }
+
+            Command::Rates(rates) => {
+                self.state
+                    .borrow_mut()
+                    .with_napkin_mut(|napkin| napkin.set_rates(*rates));
+                self.ui.borrow_mut().update(&self.state.borrow());
+            }
+
+            Command::Quit => {
+                self.window.close();
+                std::process::exit(0);
             }
         }
+    }
 
-        Command::Rates(rates) => {
-            state
-                .borrow_mut()
-                .with_napkin_mut(|napkin| napkin.set_rates(*rates));
-            ui.borrow_mut().update(&state.borrow());
+    fn show(&self, token: Option<String>, requested_at: i64) {
+        // The daemon outlives the day it started on.
+        let moved_on = self.state.borrow_mut().refresh_today();
+        if moved_on {
+            self.ui.borrow_mut().update(&self.state.borrow());
         }
 
-        Command::Quit => {
-            window.close();
-            std::process::exit(0);
+        // GTK forwards this to xdg-activation. Without it mutter refuses the focus and
+        // announces the window as a notification instead.
+        if let Some(token) = token {
+            self.window.set_startup_id(&token);
+        }
+
+        self.window.present();
+        self.start_blink();
+        self.arm(requested_at);
+    }
+
+    fn hide(&self) {
+        self.stop_blink();
+        self.window.set_visible(false);
+    }
+
+    /// Start the caret blinking, if it is not already.
+    ///
+    /// Only while the window is up: a hidden dashboard that wakes twice a second to
+    /// blink at nobody would show up in the idle measurement as costing something, and
+    /// it would be costing it for nothing.
+    fn start_blink(&self) {
+        if self.blink.borrow().is_some() {
+            return;
+        }
+
+        let app = self.clone();
+        let id = glib::timeout_add_local(
+            std::time::Duration::from_millis(theme::CURSOR_BLINK_MS),
+            move || {
+                app.state.borrow_mut().blink();
+                app.ui.borrow_mut().update_input(&app.state.borrow());
+                glib::ControlFlow::Continue
+            },
+        );
+
+        *self.blink.borrow_mut() = Some(id);
+    }
+
+    fn stop_blink(&self) {
+        if let Some(id) = self.blink.borrow_mut().take() {
+            id.remove();
         }
     }
-}
 
-fn show(
-    window: &gtk::Window,
-    state: &Rc<RefCell<AppState>>,
-    ui: &Rc<RefCell<ui::Ui>>,
-    timing: &Rc<RefCell<Timing>>,
-    recorder: &Recorder,
-    token: Option<String>,
-    requested_at: i64,
-) {
-    // The daemon outlives the day it started on.
-    let moved_on = state.borrow_mut().refresh_today();
-    if moved_on {
-        ui.borrow_mut().update(&state.borrow());
+    /// Ask the frame clock to keep producing frames until it can say when this show
+    /// reached the screen.
+    fn arm(&self, requested_at: i64) {
+        let Some(clock) = self.window.frame_clock() else {
+            tracing::warn!("no frame clock; this show goes unmeasured");
+            return;
+        };
+
+        let connect = {
+            let mut timing = self.timing.borrow_mut();
+            timing.requested_at = Some(requested_at);
+            timing.frame = None;
+            timing.attempts = 0;
+
+            let first = !timing.connected;
+            timing.connected = true;
+            first
+        };
+
+        if connect {
+            let timing = Rc::clone(&self.timing);
+            let recorder = self.recorder.clone();
+            clock.connect_after_paint(move |clock| observe(clock, &timing, &recorder));
+        }
+
+        clock.begin_updating();
     }
-
-    // GTK forwards this to xdg-activation. Without it mutter refuses the focus and
-    // announces the window as a notification instead.
-    if let Some(token) = token {
-        window.set_startup_id(&token);
-    }
-
-    window.present();
-    arm(window, timing, recorder, requested_at);
-}
-
-/// Ask the frame clock to keep producing frames until it can say when this show
-/// reached the screen.
-fn arm(window: &gtk::Window, timing: &Rc<RefCell<Timing>>, recorder: &Recorder, requested_at: i64) {
-    let Some(clock) = window.frame_clock() else {
-        tracing::warn!("no frame clock; this show goes unmeasured");
-        return;
-    };
-
-    let connect = {
-        let mut state = timing.borrow_mut();
-        state.requested_at = Some(requested_at);
-        state.frame = None;
-        state.attempts = 0;
-
-        let first = !state.connected;
-        state.connected = true;
-        first
-    };
-
-    if connect {
-        let timing = Rc::clone(timing);
-        let recorder = recorder.clone();
-        clock.connect_after_paint(move |clock| observe(clock, &timing, &recorder));
-    }
-
-    clock.begin_updating();
 }
 
 fn observe(clock: &gdk4::FrameClock, timing: &Rc<RefCell<Timing>>, recorder: &Recorder) {

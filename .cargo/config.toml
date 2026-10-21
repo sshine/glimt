@@ -1,5 +1,5 @@
 # rust-lld, which rustc uses by default on x86_64 Linux, crashes while linking
-# spike-raw: it prints an LLVM stack dump and asks for a bug report. The binary
+# glimt-raw: it prints an LLVM stack dump and asks for a bug report. The binary
 # statically links the Scheme runtime, cranelift, rustls and the whole Wayland and text
 # stack, and something in that combination it cannot do. The GNU linker links the same
 # objects without complaint.

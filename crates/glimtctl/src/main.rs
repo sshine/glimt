@@ -6,7 +6,7 @@
 
 use anyhow::Context as _;
 use clap::{Parser, Subcommand};
-use glimt_shell::{BUS_NAME, INTERFACE, OBJECT_PATH};
+use glimt_proto::{BUS_NAME, INTERFACE, OBJECT_PATH};
 
 #[derive(Parser)]
 #[command(version, about)]
