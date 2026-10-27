@@ -3,7 +3,7 @@ resolver = "2"
 members = ["crates/*"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
@@ -13,10 +13,10 @@ homepage = "https://github.com/sshine/glimt"
 # Versions live here and the crates inherit them; feature sets stay with the crate that
 # needs them, since those are what differ between members.
 [workspace.dependencies]
-glimt-cal = { version = "0.1.0", path = "crates/glimt-cal" }
-glimt-proto = { version = "0.1.0", path = "crates/glimt-proto" }
-glimt-shell = { version = "0.1.0", path = "crates/glimt-shell" }
-napkin-math = { version = "0.1.0", path = "crates/napkin-math" }
+glimt-cal = { version = "0.2.0", path = "crates/glimt-cal" }
+glimt-proto = { version = "0.2.0", path = "crates/glimt-proto" }
+glimt-shell = { version = "0.2.0", path = "crates/glimt-shell" }
+napkin-math = { version = "0.2.0", path = "crates/napkin-math" }
 
 anyhow = "1.0"
 async-channel = "2"
