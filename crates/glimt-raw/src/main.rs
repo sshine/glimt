@@ -20,7 +20,8 @@ use std::sync::Arc;
 use anyhow::Context as _;
 use clap::{Parser, ValueEnum};
 use glimt_shell::state::{Action, AppState, Response};
-use glimt_shell::{Command, Recorder, Waker, theme};
+use glimt_shell::theme::Palette;
+use glimt_shell::{Command, Recorder, Waker, appearance, theme};
 use napkin_math::Napkin;
 use smithay_client_toolkit::{
     activation::{ActivationHandler, ActivationState, RequestData},
@@ -194,6 +195,8 @@ struct App {
     pending: Option<i64>,
 
     state: AppState,
+    /// Chosen from the session's preference and repainted when that changes.
+    palette: Palette,
     text: text::Text,
     recorder: Recorder,
     keyboard: Option<wl_keyboard::WlKeyboard>,
@@ -222,8 +225,10 @@ fn main() -> anyhow::Result<()> {
         state.apply(Action::Type(character));
     }
 
+    let palette = Palette::for_scheme(appearance::current());
+
     if let Some(path) = cli.screenshot {
-        return screenshot(&state, &path);
+        return screenshot(&state, &palette, &path);
     }
 
     let connection = Connection::connect_to_env().context("connecting to the compositor")?;
@@ -308,6 +313,7 @@ fn main() -> anyhow::Result<()> {
         shown: false,
         pending: None,
         state,
+        palette,
         text: text::Text::new(),
         recorder: recorder.clone(),
         keyboard: None,
@@ -345,6 +351,11 @@ fn main() -> anyhow::Result<()> {
             .name("glimt-rates".to_owned())
             .spawn(move || glimt_shell::state::refresh_rates_forever(waker))
             .context("starting the rates thread")?;
+    }
+
+    {
+        let waker = Arc::clone(&waker);
+        appearance::watch(waker).context("starting the appearance watch")?;
     }
 
     if cli.visible {
@@ -394,6 +405,20 @@ impl App {
                 self.state
                     .with_napkin_mut(|napkin| napkin.set_rates(*rates));
                 self.full = true;
+            }
+            Command::Appearance(scheme) => {
+                let palette = Palette::for_scheme(scheme);
+
+                if palette != self.palette {
+                    self.palette = palette;
+                    // The grid underneath and the marks over it both carry colour;
+                    // throwing the cached grid away repaints the whole window from the
+                    // new palette rather than leaving half of it in the old one.
+                    self.base = None;
+                    self.previous = None;
+                    self.full = true;
+                    self.redraw_now();
+                }
             }
             Command::Quit => self.exit = true,
         }
@@ -707,7 +732,14 @@ impl App {
                 None => return Vec::new(),
             };
 
-            draw::base(&mut base, &mut self.text, overview, layout, scale as f32);
+            draw::base(
+                &mut base,
+                &mut self.text,
+                &self.palette,
+                overview,
+                layout,
+                scale as f32,
+            );
             self.base = Some(base);
             self.base_window = window;
             self.full = true;
@@ -743,6 +775,7 @@ impl App {
         draw::overlay(
             &mut self.pixmap,
             &mut self.text,
+            &self.palette,
             overview,
             &bar,
             layout,
@@ -870,7 +903,7 @@ fn swap_region(source: &Pixmap, canvas: &mut [u8], region: draw::Region, scale: 
 }
 
 /// Paint one frame off screen and write it out, with no compositor involved.
-fn screenshot(state: &AppState, path: &std::path::Path) -> anyhow::Result<()> {
+fn screenshot(state: &AppState, palette: &Palette, path: &std::path::Path) -> anyhow::Result<()> {
     let scale = 2.0;
     let width = theme::WINDOW_WIDTH;
     let height = theme::WINDOW_HEIGHT;
@@ -881,10 +914,11 @@ fn screenshot(state: &AppState, path: &std::path::Path) -> anyhow::Result<()> {
     let overview = state.overview();
     let layout = draw::Layout::new(width, height, overview.months.len());
 
-    draw::base(&mut pixmap, &mut text, overview, layout, scale);
+    draw::base(&mut pixmap, &mut text, palette, overview, layout, scale);
     draw::overlay(
         &mut pixmap,
         &mut text,
+        palette,
         overview,
         &state.bar(),
         layout,

@@ -15,7 +15,7 @@
 
 use glimt_cal::{Day, MonthColumn, Overview, Tense};
 use glimt_shell::state::Bar;
-use glimt_shell::theme::{self, Rgb};
+use glimt_shell::theme::{self, Palette, Rgb};
 use tiny_skia::{FillRule, LineCap, Paint, PathBuilder, Pixmap, Rect, Stroke, Transform};
 
 use crate::text::{Area, Style, Text};
@@ -140,18 +140,29 @@ impl Layout {
 }
 
 /// The part that only changes when the six months do.
-pub fn base(pixmap: &mut Pixmap, text: &mut Text, overview: &Overview, layout: Layout, scale: f32) {
-    pixmap.fill(solid(theme::BACKGROUND));
+pub fn base(
+    pixmap: &mut Pixmap,
+    text: &mut Text,
+    palette: &Palette,
+    overview: &Overview,
+    layout: Layout,
+    scale: f32,
+) {
+    pixmap.fill(solid(palette.background));
 
     for (index, month) in overview.months.iter().enumerate() {
-        column(pixmap, text, month, layout, index, scale);
+        column(pixmap, text, palette, month, layout, index, scale);
     }
 }
 
 /// The part that changes on every key press.
+// The three bands and the damage list are what a keystroke threads through; bundling
+// them into a context struct would only move the same arguments one level down.
+#[allow(clippy::too_many_arguments)]
 pub fn overlay(
     pixmap: &mut Pixmap,
     text: &mut Text,
+    palette: &Palette,
     overview: &Overview,
     bar: &Bar<'_>,
     layout: Layout,
@@ -159,30 +170,37 @@ pub fn overlay(
     damage: &[Region],
 ) {
     if layout.strip_band().touches(damage) {
-        strip(pixmap, text, overview, layout, scale);
+        strip(pixmap, text, palette, overview, layout, scale);
     }
 
     if layout.bar_band().touches(damage) {
-        calculator(pixmap, text, bar, layout, scale);
+        calculator(pixmap, text, palette, bar, layout, scale);
     }
 
     for (index, month) in overview.months.iter().enumerate() {
-        marks(pixmap, month, layout, index, scale, damage);
+        marks(pixmap, palette, month, layout, index, scale, damage);
     }
 }
 
-fn strip(pixmap: &mut Pixmap, text: &mut Text, overview: &Overview, layout: Layout, scale: f32) {
+fn strip(
+    pixmap: &mut Pixmap,
+    text: &mut Text,
+    palette: &Palette,
+    overview: &Overview,
+    layout: Layout,
+    scale: f32,
+) {
     let y = theme::PAD;
 
     for (index, day) in overview.strip.days.iter().enumerate() {
         let x = theme::PAD + index as f32 * (theme::SQUARE + theme::SQUARE_GAP);
-        square(pixmap, text, day, x, y, scale);
+        square(pixmap, text, palette, day, x, y, scale);
     }
 
     // Beside the boxes rather than above them, which is what made room for the
     // calculator without taking any height from the grid.
     let boxes = 7.0 * theme::SQUARE + 6.0 * theme::SQUARE_GAP;
-    let heading = Style::new(theme::WEEK_HEADING_SIZE, theme::INK).bold();
+    let heading = Style::new(theme::WEEK_HEADING_SIZE, palette.ink).bold();
     let left = theme::PAD + boxes + 28.0;
 
     text.draw(
@@ -199,11 +217,19 @@ fn strip(pixmap: &mut Pixmap, text: &mut Text, overview: &Overview, layout: Layo
     );
 }
 
-fn square(pixmap: &mut Pixmap, text: &mut Text, day: &Day, x: f32, y: f32, scale: f32) {
+fn square(
+    pixmap: &mut Pixmap,
+    text: &mut Text,
+    palette: &Palette,
+    day: &Day,
+    x: f32,
+    y: f32,
+    scale: f32,
+) {
     let (fill, ink) = match day.tense {
-        Tense::Past => (theme::PAST_FILL, theme::PAST_INK),
-        Tense::Today => (theme::ACCENT, theme::TODAY_INK),
-        Tense::Future => (theme::FUTURE_FILL, theme::INK),
+        Tense::Past => (palette.past_fill, palette.past_ink),
+        Tense::Today => (palette.accent, palette.today_ink),
+        Tense::Future => (palette.future_fill, palette.ink),
     };
 
     let Some(path) = rounded_rect(x, y, theme::SQUARE, theme::SQUARE, theme::SQUARE_RADIUS) else {
@@ -220,14 +246,14 @@ fn square(pixmap: &mut Pixmap, text: &mut Text, day: &Day, x: f32, y: f32, scale
     );
 
     if day.highlighted {
-        pixmap.fill_path(&path, &wash(), FillRule::Winding, transform, None);
+        pixmap.fill_path(&path, &wash(palette), FillRule::Winding, transform, None);
     }
 
     // A future day is white on white, so it needs the border the other two do not.
     if day.tense == Tense::Future {
         pixmap.stroke_path(
             &path,
-            &solid_paint(theme::FUTURE_BORDER),
+            &solid_paint(palette.future_border),
             &hairline(1.0),
             transform,
             None,
@@ -238,7 +264,7 @@ fn square(pixmap: &mut Pixmap, text: &mut Text, day: &Day, x: f32, y: f32, scale
     if day.selected {
         pixmap.stroke_path(
             &path,
-            &solid_paint(theme::SELECTION),
+            &solid_paint(palette.selection),
             &hairline(theme::SELECTION_RING),
             transform,
             None,
@@ -266,7 +292,14 @@ fn square(pixmap: &mut Pixmap, text: &mut Text, day: &Day, x: f32, y: f32, scale
     );
 }
 
-fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layout, scale: f32) {
+fn calculator(
+    pixmap: &mut Pixmap,
+    text: &mut Text,
+    palette: &Palette,
+    bar: &Bar<'_>,
+    layout: Layout,
+    scale: f32,
+) {
     let width = layout.width - 2.0 * theme::PAD;
 
     if let Some(path) = rounded_rect(
@@ -278,7 +311,7 @@ fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layou
     ) {
         pixmap.fill_path(
             &path,
-            &solid_paint(theme::BAR_FILL),
+            &solid_paint(palette.bar_fill),
             FillRule::Winding,
             Transform::from_scale(scale, scale),
             None,
@@ -286,7 +319,7 @@ fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layou
     }
 
     let inset = 14.0;
-    let body = Style::new(theme::BAR_TEXT_SIZE, theme::INK);
+    let body = Style::new(theme::BAR_TEXT_SIZE, palette.ink);
 
     text.draw(
         pixmap,
@@ -304,7 +337,7 @@ fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layou
     // A problem replaces the answer and is written small and grey, because the only
     // ones that reach here are real and none of them are urgent.
     if let Some(problem) = bar.problem {
-        let style = Style::new(theme::BAR_NOTE_SIZE, theme::MUTED).right();
+        let style = Style::new(theme::BAR_NOTE_SIZE, palette.muted).right();
         text.draw(
             pixmap,
             problem,
@@ -326,7 +359,11 @@ fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layou
 
     // An answer older than the line it sits on goes grey. That is the whole of how an
     // unfinished expression reports itself.
-    let colour = if bar.faded { theme::FADED } else { theme::INK };
+    let colour = if bar.faded {
+        palette.faded
+    } else {
+        palette.ink
+    };
     let result = Style::new(theme::BAR_TEXT_SIZE, colour).bold().right();
     let has_note = answer.note.is_some();
     let lift = if has_note { 7.0 } else { 0.0 };
@@ -345,7 +382,7 @@ fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layou
     );
 
     if let Some(note) = answer.note.as_deref() {
-        let style = Style::new(theme::BAR_NOTE_SIZE, theme::MUTED).right();
+        let style = Style::new(theme::BAR_NOTE_SIZE, palette.muted).right();
         text.draw(
             pixmap,
             note,
@@ -364,6 +401,7 @@ fn calculator(pixmap: &mut Pixmap, text: &mut Text, bar: &Bar<'_>, layout: Layou
 fn column(
     pixmap: &mut Pixmap,
     text: &mut Text,
+    palette: &Palette,
     month: &MonthColumn,
     layout: Layout,
     index: usize,
@@ -379,12 +417,12 @@ fn column(
             layout.grid_top,
             1.0,
             HEADING_BAND + height,
-            theme::RULE,
+            palette.rule,
             scale,
         );
     }
 
-    let heading = Style::new(theme::MONTH_HEADING_SIZE, theme::INK).bold();
+    let heading = Style::new(theme::MONTH_HEADING_SIZE, palette.ink).bold();
     text.draw(
         pixmap,
         &month.heading,
@@ -399,21 +437,28 @@ fn column(
     );
 
     for (position, day) in month.days.iter().enumerate() {
-        row(pixmap, text, day, x, layout.row_y(position), layout, scale);
+        row(
+            pixmap,
+            text,
+            palette,
+            day,
+            layout.row_band(index, position),
+            scale,
+        );
     }
 }
 
 fn row(
     pixmap: &mut Pixmap,
     text: &mut Text,
+    palette: &Palette,
     day: &Day,
-    x: f32,
-    y: f32,
-    layout: Layout,
+    area: Region,
     scale: f32,
 ) {
-    let width = layout.column_width - 2.0 * theme::ROW_INSET;
-    let height = layout.row_height;
+    let width = area.width - 2.0 * theme::ROW_INSET;
+    let height = area.height;
+    let (x, y) = (area.x, area.y);
 
     if day.shaded() {
         fill(
@@ -422,12 +467,12 @@ fn row(
             y,
             width,
             height,
-            theme::SHADE,
+            palette.shade,
             scale,
         );
     }
 
-    let body = Style::new(theme::MONTH_ROW_SIZE, theme::INK);
+    let body = Style::new(theme::MONTH_ROW_SIZE, palette.ink);
 
     text.draw(
         pixmap,
@@ -445,7 +490,7 @@ fn row(
     );
 
     if let Some(holiday) = day.holiday {
-        let label = Style::new(theme::HOLIDAY_SIZE, theme::MUTED);
+        let label = Style::new(theme::HOLIDAY_SIZE, palette.muted);
         text.draw(
             pixmap,
             holiday.name,
@@ -459,7 +504,7 @@ fn row(
         text.draw(
             pixmap,
             &week.to_string(),
-            Area::new(x + layout.column_width - 30.0, y, 24.0, height),
+            Area::new(x + area.width - 30.0, y, 24.0, height),
             body.bold().right(),
             scale,
         );
@@ -470,6 +515,7 @@ fn row(
 /// the days a duration covers.
 fn marks(
     pixmap: &mut Pixmap,
+    palette: &Palette,
     month: &MonthColumn,
     layout: Layout,
     index: usize,
@@ -489,7 +535,7 @@ fn marks(
 
         if day.highlighted {
             if let Some(rect) = Rect::from_xywh(x + theme::ROW_INSET, y, width, layout.row_height) {
-                pixmap.fill_rect(rect, &wash(), transform, None);
+                pixmap.fill_rect(rect, &wash(palette), transform, None);
             }
         }
 
@@ -500,18 +546,19 @@ fn marks(
                 y,
                 theme::SELECTION_RING,
                 layout.row_height,
-                theme::SELECTION,
+                palette.selection,
                 scale,
             );
         }
     }
 
-    focus_outline(pixmap, month, layout, index, scale, damage);
+    focus_outline(pixmap, palette, month, layout, index, scale, damage);
 }
 
 /// One box around the run of days belonging to the week the strip shows.
 fn focus_outline(
     pixmap: &mut Pixmap,
+    palette: &Palette,
     month: &MonthColumn,
     layout: Layout,
     index: usize,
@@ -550,7 +597,7 @@ fn focus_outline(
 
     pixmap.fill_path(
         &path,
-        &solid_paint(theme::ACCENT),
+        &solid_paint(palette.accent),
         FillRule::Winding,
         Transform::from_scale(scale, scale),
         None,
@@ -609,13 +656,13 @@ fn solid_paint(color: Rgb) -> Paint<'static> {
 
 /// The highlight, laid over what is already drawn so a highlighted weekend still reads
 /// as a weekend and the numbers stay legible through it.
-fn wash() -> Paint<'static> {
+fn wash(palette: &Palette) -> Paint<'static> {
     Paint {
         shader: tiny_skia::Shader::SolidColor(tiny_skia::Color::from_rgba8(
-            theme::HIGHLIGHT.0,
-            theme::HIGHLIGHT.1,
-            theme::HIGHLIGHT.2,
-            theme::HIGHLIGHT_ALPHA,
+            palette.highlight.0,
+            palette.highlight.1,
+            palette.highlight.2,
+            palette.highlight_alpha,
         )),
         anti_alias: true,
         ..Paint::default()

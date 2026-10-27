@@ -66,9 +66,14 @@ one of the two that can take a layer surface without a C library in the way.
 Both are kept in step. Everything except the drawing is shared, so a feature is written
 once and drawn twice: `glimt-cal` holds the calendar as data, `napkin-math` the
 calculator, and `glimt-shell` the daemon, the D-Bus service, the global shortcut, the
-design tokens and the state machine that says what a key does, and `glimt-proto` the
-three names a client needs. Each frontend translates its own key events into that
-vocabulary and renders the result.
+design tokens and the light and dark palettes, and `glimt-proto` the three names a
+client needs. Each frontend translates its own key events into that vocabulary and
+renders the result.
+
+Neither has a theme switch of its own: both follow the session's light or dark
+preference through the XDG settings portal, including the common case where the session
+is dark through its GTK theme rather than through `color-scheme`. The palette is
+reloaded in place, so switching while the daemon is resident repaints both.
 
 The comparison and its numbers are in [docs/graphics-stack-decision.md].
 

@@ -8,6 +8,7 @@
 
 use std::sync::{Arc, Mutex};
 
+pub mod appearance;
 pub mod logging;
 pub mod portal;
 pub mod service;
@@ -37,6 +38,8 @@ pub enum Command {
     /// A fresher rate table, from the thread that went to the ECB. Boxed because it is
     /// far larger than every other message and they are all the same size.
     Rates(Box<napkin_math::Rates>),
+    /// The desktop switched between its light and dark preference.
+    Appearance(appearance::Scheme),
 }
 
 pub use glimt_proto::{BUS_NAME, INTERFACE, OBJECT_PATH, Sample, monotonic_us};

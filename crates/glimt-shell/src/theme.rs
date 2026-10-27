@@ -5,9 +5,16 @@
 //! one of the things being compared, but the numbers it lays out from are fixed here. A
 //! difference in the drawn result is then a difference in the renderer.
 //!
+//! Colours come in two palettes rather than as constants: the session's own light or
+//! dark preference picks one, and both candidates paint from the same one. Every role
+//! that used to be a single constant is a field, so a colour added later cannot be
+//! added to one palette and forgotten in the other.
+//!
 //! Lengths are logical pixels, before the output's scale is applied. The window is
 //! maximized, so its width and height come from the compositor and the layout is
 //! computed against them; the constants below are minimums and fixed parts.
+
+use crate::appearance::Scheme;
 
 /// Straight 8-bit sRGB, which is what both a GTK CSS colour and a tiny-skia paint want.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,29 +27,102 @@ impl Rgb {
     }
 }
 
-pub const BACKGROUND: Rgb = Rgb(0xff, 0xff, 0xff);
-pub const INK: Rgb = Rgb(0x11, 0x11, 0x11);
-pub const MUTED: Rgb = Rgb(0x8a, 0x8a, 0x8a);
-/// Weekends and public holidays, as the reference shades them.
-pub const SHADE: Rgb = Rgb(0xd6, 0xd6, 0xd6);
-pub const RULE: Rgb = Rgb(0xdf, 0xdf, 0xdf);
-/// Today, and the outline the month columns put around the week on show.
-pub const ACCENT: Rgb = Rgb(0xc6, 0x28, 0x28);
+/// Every colour either frontend paints with, in one of two variants.
+///
+/// The light values are the ones the dashboard was drawn with before there was a dark
+/// one. The dark values keep the same relationships: ink readable on every surface,
+/// today still red and the selection still blue, the highlight a wash rather than a
+/// fill, and the past still quieter than the future.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Palette {
+    pub background: Rgb,
+    pub ink: Rgb,
+    pub muted: Rgb,
+    /// Weekends and public holidays, as the reference shades them.
+    pub shade: Rgb,
+    pub rule: Rgb,
+    /// Today, and the outline the month columns put around the week on show.
+    pub accent: Rgb,
+    /// The day the keyboard is on. Blue rather than another red, so that moving the
+    /// selection away from today leaves both visible and tells them apart.
+    pub selection: Rgb,
+    /// The days a duration covers. Laid over what is already drawn, so it has to be
+    /// light enough to read text through and distinct from the grey of a weekend.
+    pub highlight: Rgb,
+    /// How much of the highlight shows through, out of 255.
+    pub highlight_alpha: u8,
 
-/// The day the keyboard is on. Blue rather than another red, so that moving the
-/// selection away from today leaves both visible and tells them apart.
-pub const SELECTION: Rgb = Rgb(0x1d, 0x5f, 0xc4);
-/// The days a duration covers. Laid over what is already drawn, so it has to be light
-/// enough to read text through and distinct from the grey of a weekend.
-pub const HIGHLIGHT: Rgb = Rgb(0x9a, 0xc0, 0xf0);
-/// How much of the highlight shows through, out of 255.
-pub const HIGHLIGHT_ALPHA: u8 = 110;
+    pub past_fill: Rgb,
+    pub past_ink: Rgb,
+    pub today_ink: Rgb,
+    pub future_fill: Rgb,
+    pub future_border: Rgb,
 
-pub const PAST_FILL: Rgb = Rgb(0xec, 0xec, 0xec);
-pub const PAST_INK: Rgb = Rgb(0x9a, 0x9a, 0x9a);
-pub const TODAY_INK: Rgb = Rgb(0xff, 0xff, 0xff);
-pub const FUTURE_FILL: Rgb = BACKGROUND;
-pub const FUTURE_BORDER: Rgb = Rgb(0xc9, 0xc9, 0xc9);
+    /// The calculator, between the week strip and the month grid.
+    pub bar_fill: Rgb,
+    /// An answer that belongs to an earlier keystroke, which is how an unfinished
+    /// expression reports itself: by going quiet rather than by complaining.
+    pub faded: Rgb,
+
+    /// How dark the fullscreen backdrop is, out of 255. The backdrop is black in both
+    /// palettes; it is heavier in the dark one so the card still separates from it.
+    pub scrim_alpha: u8,
+}
+
+impl Palette {
+    pub const LIGHT: Self = Self {
+        background: Rgb(0xff, 0xff, 0xff),
+        ink: Rgb(0x11, 0x11, 0x11),
+        muted: Rgb(0x8a, 0x8a, 0x8a),
+        shade: Rgb(0xd6, 0xd6, 0xd6),
+        rule: Rgb(0xdf, 0xdf, 0xdf),
+        accent: Rgb(0xc6, 0x28, 0x28),
+        selection: Rgb(0x1d, 0x5f, 0xc4),
+        highlight: Rgb(0x9a, 0xc0, 0xf0),
+        highlight_alpha: 110,
+
+        past_fill: Rgb(0xec, 0xec, 0xec),
+        past_ink: Rgb(0x9a, 0x9a, 0x9a),
+        today_ink: Rgb(0xff, 0xff, 0xff),
+        future_fill: Rgb(0xff, 0xff, 0xff),
+        future_border: Rgb(0xc9, 0xc9, 0xc9),
+
+        bar_fill: Rgb(0xf4, 0xf4, 0xf6),
+        faded: Rgb(0xa8, 0xa8, 0xa8),
+
+        scrim_alpha: 89,
+    };
+
+    pub const DARK: Self = Self {
+        background: Rgb(0x1b, 0x1b, 0x1d),
+        ink: Rgb(0xec, 0xec, 0xed),
+        muted: Rgb(0xa3, 0xa3, 0xa6),
+        shade: Rgb(0x2b, 0x2b, 0x2f),
+        rule: Rgb(0x3a, 0x3a, 0x3e),
+        accent: Rgb(0xd2, 0x3f, 0x3f),
+        selection: Rgb(0x7a, 0xa7, 0xff),
+        highlight: Rgb(0x4a, 0x7d, 0xbd),
+        highlight_alpha: 96,
+
+        past_fill: Rgb(0x26, 0x26, 0x2a),
+        past_ink: Rgb(0x7a, 0x7a, 0x80),
+        today_ink: Rgb(0xff, 0xff, 0xff),
+        future_fill: Rgb(0x1b, 0x1b, 0x1d),
+        future_border: Rgb(0x45, 0x45, 0x4a),
+
+        bar_fill: Rgb(0x2a, 0x2a, 0x2e),
+        faded: Rgb(0x78, 0x78, 0x7e),
+
+        scrim_alpha: 140,
+    };
+
+    pub fn for_scheme(scheme: Scheme) -> Self {
+        match scheme {
+            Scheme::Light => Self::LIGHT,
+            Scheme::Dark => Self::DARK,
+        }
+    }
+}
 
 /// Resolved through fontconfig by both candidates, so Pango and cosmic-text pick the
 /// same file rather than each applying its own idea of a default.
@@ -67,13 +147,9 @@ pub const SELECTION_RING: f32 = 3.0;
 
 /// The calculator, between the week strip and the month grid.
 pub const BAR_HEIGHT: f32 = 52.0;
-pub const BAR_FILL: Rgb = Rgb(0xf4, 0xf4, 0xf6);
 pub const BAR_RADIUS: f32 = 8.0;
 pub const BAR_TEXT_SIZE: f32 = 21.0;
 pub const BAR_NOTE_SIZE: f32 = 11.0;
-/// An answer that belongs to an earlier keystroke, which is how an unfinished
-/// expression reports itself: by going quiet rather than by complaining.
-pub const FADED: Rgb = Rgb(0xa8, 0xa8, 0xa8);
 /// The prompt in front of the expression.
 pub const PROMPT: &str = "=";
 /// The caret, drawn after whatever has been typed.

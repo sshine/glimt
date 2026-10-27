@@ -16,7 +16,8 @@ use std::sync::Arc;
 use anyhow::Context as _;
 use clap::{Parser, ValueEnum};
 use glimt_shell::state::{Action, AppState, Response};
-use glimt_shell::{Command, Recorder, Waker, theme};
+use glimt_shell::theme::Palette;
+use glimt_shell::{Command, Recorder, Waker, appearance, theme};
 use gtk4 as gtk;
 use gtk4::prelude::*;
 use napkin_math::Napkin;
@@ -123,8 +124,9 @@ fn main() -> anyhow::Result<()> {
     let state = Rc::new(RefCell::new(initial));
 
     let display = gdk4::Display::default().context("no display")?;
+    let palette = Palette::for_scheme(appearance::current());
     let provider = gtk::CssProvider::new();
-    provider.load_from_string(&format!("{}{}", style::sheet(), style::overlay_sheet()));
+    provider.load_from_string(&style::sheet(&palette));
     gtk::style_context_add_provider_for_display(
         &display,
         &provider,
@@ -141,6 +143,8 @@ fn main() -> anyhow::Result<()> {
         timing: Rc::new(RefCell::new(Timing::default())),
         recorder: Recorder::new(),
         blink: Rc::new(RefCell::new(None)),
+        provider,
+        palette: std::cell::Cell::new(palette),
     };
 
     app.install_keys();
@@ -164,6 +168,11 @@ fn main() -> anyhow::Result<()> {
                 }
             })
             .context("starting the service thread")?;
+    }
+
+    {
+        let waker = Arc::clone(&waker);
+        appearance::watch(waker).context("starting the appearance watch")?;
     }
 
     if !cli.offline {
@@ -261,6 +270,9 @@ struct App {
     recorder: Recorder,
     /// The caret timer, which runs only while the window is up.
     blink: Rc<RefCell<Option<glib::SourceId>>>,
+    /// Reloaded in place when the session switches between light and dark.
+    provider: gtk::CssProvider,
+    palette: std::cell::Cell<Palette>,
 }
 
 impl App {
@@ -333,6 +345,16 @@ impl App {
                     .borrow_mut()
                     .with_napkin_mut(|napkin| napkin.set_rates(*rates));
                 self.ui.borrow_mut().update(&self.state.borrow());
+            }
+
+            Command::Appearance(scheme) => {
+                let palette = Palette::for_scheme(scheme);
+
+                // A palette that did not actually change is not worth a restyle.
+                if palette != self.palette.get() {
+                    self.palette.set(palette);
+                    self.provider.load_from_string(&style::sheet(&palette));
+                }
             }
 
             Command::Quit => {

@@ -1,30 +1,32 @@
-//! The style sheet, generated from the shared theme.
+//! The style sheet, generated from the shared palette.
 //!
-//! Written out of the same constants the other candidate paints from, rather than
-//! copied into a `.css` file, because a colour that differs between the two candidates
-//! would read as a rendering difference when comparing screenshots.
+//! Written out of the same colours the other candidate paints from, rather than copied
+//! into a `.css` file, because a colour that differs between the two candidates would
+//! read as a rendering difference when comparing screenshots. Taking the palette as an
+//! argument is also what lets the sheet be regenerated when the session switches between
+//! light and dark without reloading the process.
 //!
 //! The backdrop goes on a widget this project owns rather than on the window. Putting
 //! it on the window leaves the drawing at the mercy of whichever Adwaita variant the
-//! session happens to be in, and this session is dark.
+//! session happens to be in.
 
-use glimt_shell::theme;
+use glimt_shell::theme::{self, Palette};
 
-pub fn sheet() -> String {
-    let ink = theme::INK.hex();
-    let muted = theme::MUTED.hex();
-    let shade = theme::SHADE.hex();
-    let rule = theme::RULE.hex();
-    let accent = theme::ACCENT.hex();
-    let selection = theme::SELECTION.hex();
-    let background = theme::BACKGROUND.hex();
-    let past_fill = theme::PAST_FILL.hex();
-    let past_ink = theme::PAST_INK.hex();
-    let today_ink = theme::TODAY_INK.hex();
-    let future_fill = theme::FUTURE_FILL.hex();
-    let future_border = theme::FUTURE_BORDER.hex();
-    let bar_fill = theme::BAR_FILL.hex();
-    let faded = theme::FADED.hex();
+pub fn sheet(palette: &Palette) -> String {
+    let ink = palette.ink.hex();
+    let muted = palette.muted.hex();
+    let shade = palette.shade.hex();
+    let rule = palette.rule.hex();
+    let accent = palette.accent.hex();
+    let selection = palette.selection.hex();
+    let background = palette.background.hex();
+    let past_fill = palette.past_fill.hex();
+    let past_ink = palette.past_ink.hex();
+    let today_ink = palette.today_ink.hex();
+    let future_fill = palette.future_fill.hex();
+    let future_border = palette.future_border.hex();
+    let bar_fill = palette.bar_fill.hex();
+    let faded = palette.faded.hex();
 
     let font = theme::FONT;
     let heading = theme::WEEK_HEADING_SIZE;
@@ -39,8 +41,13 @@ pub fn sheet() -> String {
     let bar_note = theme::BAR_NOTE_SIZE;
     let bar_radius = theme::BAR_RADIUS;
     let pad = theme::PAD;
-    let alpha = f64::from(theme::HIGHLIGHT_ALPHA) / 255.0;
-    let (hr, hg, hb) = (theme::HIGHLIGHT.0, theme::HIGHLIGHT.1, theme::HIGHLIGHT.2);
+    let alpha = f64::from(palette.highlight_alpha) / 255.0;
+    let (hr, hg, hb) = (
+        palette.highlight.0,
+        palette.highlight.1,
+        palette.highlight.2,
+    );
+    let scrim = f64::from(palette.scrim_alpha) / 255.0;
 
     format!(
         "
@@ -96,17 +103,10 @@ window.glimt {{ background-color: {background}; font-family: {font}; }}
 .bar-result.faded {{ color: {faded}; font-weight: 400; }}
 .bar-result.problem {{ font-size: {bar_note}px; font-weight: 400; color: {muted}; }}
 .bar-note   {{ font-size: {bar_note}px; color: {muted}; }}
-"
-    )
-}
 
-/// The fullscreen shape: a translucent backdrop with the dashboard as a card on it.
-pub fn overlay_sheet() -> String {
-    format!(
-        "
-window.glimt.overlay {{ background-color: rgba(0, 0, 0, 0.35); }}
-.card {{ background-color: {}; border-radius: 14px; }}
-",
-        theme::BACKGROUND.hex()
+/* The fullscreen shape: a translucent backdrop with the dashboard as a card on it. */
+window.glimt.overlay {{ background-color: rgba(0, 0, 0, {scrim}); }}
+.card {{ background-color: {background}; border-radius: 14px; }}
+"
     )
 }
