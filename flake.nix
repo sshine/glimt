@@ -9,6 +9,12 @@
 
     import-tree.url = "github:vic/import-tree";
 
+    crate2nix = {
+      url = "github:nix-community/crate2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
+
     dendritic-base = {
       url = "github:nix-tools/dendritic-base";
       inputs.nixpkgs.follows = "nixpkgs";

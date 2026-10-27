@@ -1,7 +1,12 @@
-{ ... }:
+{ inputs, ... }:
 {
   perSystem =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      system,
+      ...
+    }:
     let
       gui = import ./_gui-deps.nix pkgs;
 
@@ -22,6 +27,9 @@
     {
       devshells.default = {
         packages = [
+          # Regenerates Cargo.nix; see `just crate2nix`. Pinned by this flake rather than
+          # taken from nixpkgs, so the generator and the Cargo.nix in the tree move together.
+          inputs.crate2nix.packages.${system}.default
           # Reading the benchmark output by hand.
           pkgs.jq
           # The portability check runs the frontends under a nested wlroots compositor on

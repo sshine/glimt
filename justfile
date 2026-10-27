@@ -86,8 +86,27 @@ test:
 lock-check:
     cargo metadata --locked --format-version 1 > /dev/null
 
+# Regenerate Cargo.nix from the manifests (crate2nix builds one derivation per crate)
+crate2nix:
+    crate2nix generate
+
+# Verify Cargo.nix is in step with the manifests
+#
+# Committed rather than generated at evaluation time, which is the trade this workspace
+# makes at four hundred dependencies: evaluation stays fast and the file is reviewable,
+# at the cost of a regeneration step that this check is what catches.
+crate2nix-check:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    before=$(sha256sum Cargo.nix)
+    crate2nix generate >/dev/null
+    if [ "$before" != "$(sha256sum Cargo.nix)" ]; then
+      echo "Cargo.nix is out of step with Cargo.toml/Cargo.lock; run \`just crate2nix\`" >&2
+      exit 1
+    fi
+
 # Run CI checks locally
-ci: fmt-check lint test lock-check module
+ci: fmt-check lint test lock-check module crate2nix-check
     @echo "All CI checks passed!"
 
 release_targets := "x86_64-unknown-linux-musl aarch64-unknown-linux-musl"
