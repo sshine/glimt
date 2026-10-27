@@ -21,12 +21,18 @@ jobs:
             keep-env-derivations = true
             keep-outputs = true
 
+      # The same key formula as the CI workflow. A tag points at a commit main already
+      # built, so every derivation below is a restore rather than a compile.
       - name: Restore and save Nix store
         uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7.0.2, 2026-01-30
         with:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock', '**/Cargo.lock') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
-          gc-max-store-size-linux: 2G
+          # 4.4 GiB is what the flake check and the dev shell need together, measured with
+          # `nix path-info` over the union closure: the toolchain, GTK, Wayland and the
+          # five hundred per-crate outputs. A 2G budget evicted more than half of that
+          # before the cache was written, so every run recompiled what the last one built.
+          gc-max-store-size-linux: 6G
           purge: true
           purge-prefixes: nix-${{ runner.os }}-
           purge-created: 0
@@ -35,12 +41,19 @@ jobs:
 
       # Gate the release on the same checks CI runs, so a tag can never publish
       # something that would have failed on main.
-      - name: Build, test and lint
-        run: nix develop -c just ci
+      - name: Flake check
+        run: nix flake check -L
+
+      - name: Verify Cargo.lock and Cargo.nix
+        run: nix develop -c just lock-check crate2nix-check
 
       # Only the client ships as a binary. The dashboard links GTK, or Wayland and
       # fontconfig, so a static musl build of it is not a thing that exists; it is
       # installed from this flake instead, which is what the NixOS module does.
+      #
+      # This is the one step that shares nothing with the check above: a crate compiled
+      # for musl is a different compilation from the same crate compiled for the host,
+      # so the client's dependencies are built here and nowhere else.
       - name: Build the static client
         run: nix develop -c just dist "${GITHUB_REF_NAME}"
 

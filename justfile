@@ -74,11 +74,14 @@ fmt:
 fmt-check:
     treefmt --fail-on-change --no-cache
 
-# Run clippy lints
+# Run clippy lints, incrementally, against the target/ directory
+#
+# `just check` is what CI runs: this one is for the edit-compile loop, where cargo
+# reusing yesterday's artifacts beats a sandbox that cannot see them.
 lint:
     cargo clippy --all-targets --all-features -- -D warnings
 
-# Run all tests
+# Run all tests, incrementally
 test:
     cargo test --all-features
 
@@ -105,8 +108,12 @@ crate2nix-check:
       exit 1
     fi
 
+# Formatting, lints, tests, both frontends and the NixOS module, in one cached pass
+check *args:
+    nix flake check -L {{args}}
+
 # Run CI checks locally
-ci: fmt-check lint test lock-check module crate2nix-check
+ci: check lock-check crate2nix-check
     @echo "All CI checks passed!"
 
 release_targets := "x86_64-unknown-linux-musl aarch64-unknown-linux-musl"
