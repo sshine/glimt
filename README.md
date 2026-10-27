@@ -122,6 +122,12 @@ That installs `glimt` and `glimtctl`, runs the daemon as a user service bound to
 `graphical-session.target`, and binds `<Super>Return` to `glimtctl toggle` through dconf.
 Not Super+space: that is GNOME's own binding for switching input sources, and is already
 taken on any machine with two keyboard layouts.
+
+The daemon owns one session-bus name, and it is the first instance to claim it that keeps
+it: an instance started while the service is running waits for the name instead of taking
+it from under the resident one, and takes over when the service stops. That is why the
+key keeps reaching the service, and why `systemctl --user stop glimt` is what to run
+before `just dev` when the key should drive the development instance instead.
 The options:
 
 | Option | Default | |
@@ -133,15 +139,24 @@ The options:
 | `trigger` | `SUPER+Return` | what to ask the portal for, in its notation |
 | `extraArgs` | `[ ]` | anything else for the daemon's command line |
 
-**If the key does nothing**, it is almost certainly this: GNOME keeps every custom
-keybinding in one dconf list. The module sets that list as a system default, and a user
-who has ever added a custom shortcut through Settings has a list of their own in
-`~/.config/dconf/user` that shadows it. Either add the binding by hand once, or set
-`services.glimt.portal = true` and `shortcut = null`, which makes glimt register the
-shortcut itself through the GlobalShortcuts portal. GNOME then asks once, in a dialog,
-and remembers. The portal is also the only one of the two whose key press carries an
-activation token, which is what mutter wants before it will hand a window the keyboard,
-so it is worth switching to if the window comes up without focus.
+**If the key does nothing**, check the daemon before the keybinding:
+
+```sh
+glimtctl show                 # "not activatable" when nothing is listening
+systemctl --user status glimt
+```
+
+The service retries a name it cannot claim, and re-claims one it loses, for as long as it
+runs, so a daemon that is up and still not answering is a bug rather than a thing to work
+around. The other cause is the dconf list: GNOME keeps every custom keybinding in one
+list. The module sets that list as a system default, and a user who has ever added a
+custom shortcut through Settings has a list of their own in `~/.config/dconf/user` that
+shadows it. Either add the binding by hand once, or set `services.glimt.portal = true`
+and `shortcut = null`, which makes glimt register the shortcut itself through the
+GlobalShortcuts portal. GNOME then asks once, in a dialog, and remembers. The portal is
+also the only one of the two whose key press carries an activation token, which is what
+mutter wants before it will hand a window the keyboard, so it is worth switching to if
+the window comes up without focus.
 
 The module is checked on every build: `nix build .#checks.<system>.module` evaluates a
 system with it enabled and writes out the service command and the dconf keys, because
