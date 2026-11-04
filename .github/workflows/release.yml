@@ -47,20 +47,25 @@ jobs:
       - name: Verify Cargo.lock and Cargo.nix
         run: nix develop -c just lock-check crate2nix-check
 
-      # Only the client ships as a binary. The dashboard links GTK, or Wayland and
-      # fontconfig, so a static musl build of it is not a thing that exists; it is
-      # installed from this flake instead, which is what the NixOS module does.
+      # The client is the only static binary. The dashboard links GTK, or Wayland and
+      # fontconfig, so a static musl build of it is not a thing that exists; `just dist`
+      # also builds it as an AppImage with its whole runtime closure.
       #
       # This is the one step that shares nothing with the check above: a crate compiled
       # for musl is a different compilation from the same crate compiled for the host,
       # so the client's dependencies are built here and nowhere else.
-      - name: Build the static client
+      - name: Build the static client and the dashboard AppImage
         run: nix develop -c just dist "${GITHUB_REF_NAME}"
 
       - name: Smoke-test the x86_64 client
         run: |
           tar -xzf "dist/glimtctl-${GITHUB_REF_NAME}-x86_64-unknown-linux-musl.tar.gz" -C /tmp
           /tmp/glimtctl --version
+
+      - name: Smoke-test the x86_64 AppImage
+        run: |
+          chmod +x dist/glimt-*-x86_64.AppImage
+          ./dist/glimt-*-x86_64.AppImage --version
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2, 2026-07-13
@@ -69,3 +74,5 @@ jobs:
           files: |
             dist/*.tar.gz
             dist/*.tar.gz.sha256
+            dist/*.AppImage
+            dist/*.AppImage.sha256

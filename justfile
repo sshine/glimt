@@ -127,9 +127,9 @@ check-version version:
 
 # Build the static client and its checksums into dist/.
 #
-# Only the client. The dashboard links GTK, or Wayland and fontconfig, so a static musl
-# build of it is not a thing that exists; it is installed from this flake instead, which
-# is what the NixOS module does.
+# Only the client is a static binary. The dashboard links GTK, or Wayland and fontconfig,
+# so a static musl build of it is not a thing that exists; it ships as the AppImage that
+# `appimage` adds to the same directory.
 dist version: (check-version version)
     rm -rf dist && mkdir -p dist
     set -e; for target in {{release_targets}}; do \
@@ -138,7 +138,19 @@ dist version: (check-version version)
         tar -czf "dist/$name.tar.gz" -C "target/$target/release" glimtctl; \
         ( cd dist && sha256sum "$name.tar.gz" > "$name.tar.gz.sha256" ); \
     done
+    just appimage {{version}}
     @ls -1 dist
+
+# Build the dashboard as a single-file AppImage for the host architecture.
+#
+# The AppImage carries the whole runtime closure, so it does not need Nix, GTK or the
+# Nix store on the machine that runs it. It is built by the flake rather than by cargo:
+# see nix/appimage.nix.
+appimage version:
+    nix build .#glimt-appimage
+    name="glimt-{{version}}-$(uname -m).AppImage"; \
+    cp -fL result "dist/$name"; \
+    ( cd dist && sha256sum "$name" > "$name.sha256" )
 
 # Evaluate the NixOS module, which nothing else type-checks
 module:

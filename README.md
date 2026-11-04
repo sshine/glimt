@@ -167,6 +167,31 @@ The module is checked on every build: `nix build .#checks.<system>.module` evalu
 system with it enabled and writes out the service command and the dconf keys, because
 nothing else type-checks a module until someone rebuilds their machine.
 
+## Releases
+
+A tag publishes two kinds of artifact:
+
+- `glimtctl-<tag>-{x86_64,aarch64}-unknown-linux-musl.tar.gz`: the client, statically
+  linked against musl.
+- `glimt-<tag>-x86_64.AppImage`: the dashboard as a single file for Linux machines
+  without Nix. It carries its runtime closure, so it needs neither Nix nor a matching
+  GTK or glibc on the host. It is about 110 MiB.
+
+`just dist <tag>` builds both; `just appimage <tag>` builds only the AppImage. The
+AppImage is still dynamically linked like any GTK application: "single file" means the
+libraries, GIO modules, GSettings schemas and gdk-pixbuf loaders travel inside the
+squashfs instead of being linked into the ELF. GTK's GStreamer media backend is disabled
+for this build, which is most of the difference between 110 MiB and the 353 MiB the
+default GTK closure produces.
+
+The flake also exposes `glimt-bin` and `glimtctl-bin` for Nix users on other Linux
+distributions who want the published artifacts instead of a source build. They pin the
+same release in `nix/binary.nix`.
+
+On NixOS, keep using the module above. The source build shares the system's GTK, fonts
+and icon theme; an AppImage would carry a second copy of GTK and relies on the host's
+font and icon directories being visible to it.
+
 ## Running it
 
 ```sh

@@ -6,6 +6,9 @@
 /result
 /hk.pkl
 
+# Release artifacts
+/dist/
+
 # Benchmark output
 /bench-results/
 
