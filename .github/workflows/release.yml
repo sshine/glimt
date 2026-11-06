@@ -18,7 +18,61 @@ on:
         default: true
 
 jobs:
+  # The AppImage build is the long pole: its X11-free GTK closure is a different set of
+  # derivations from the host GTK that `nix flake check` builds. It gets its own job and
+  # its own cache key so that the build succeeds and the cache is saved even when the
+  # smoke test below fails. cache-nix-action's post step runs only on success, and it
+  # will not overwrite an existing key, so sharing the CI key would lose the closure as
+  # soon as the Rust CI job had saved it.
+  appimage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      RELEASE_VERSION: ${{ inputs.version || github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0, 2026-07-16
+
+      - uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35, 2026-06-17
+        with:
+          nix_conf: |
+            keep-env-derivations = true
+            keep-outputs = true
+
+      - name: Restore and save Nix store
+        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7.0.2, 2026-01-30
+        with:
+          primary-key: nix-${{ runner.os }}-appimage-${{ hashFiles('**/*.nix', '**/flake.lock', '**/Cargo.lock') }}
+          restore-prefixes-first-match: |
+            nix-${{ runner.os }}-appimage-
+            nix-${{ runner.os }}-
+          # 4.4 GiB is what the flake check and the dev shell need together, measured with
+          # `nix path-info` over the union closure: the toolchain, GTK, Wayland and the
+          # five hundred per-crate outputs. A 2G budget evicted more than half of that
+          # before the cache was written, so every run recompiled what the last one built.
+          gc-max-store-size-linux: 6G
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-appimage-
+          purge-created: 0
+          purge-last-accessed: P1DT12H
+          purge-primary-key: never
+
+      - name: Build the dashboard AppImage
+        run: nix develop -c just appimage "${RELEASE_VERSION}"
+
+      - name: Upload the AppImage
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2, 2026-10-07
+        with:
+          name: appimage
+          path: |
+            dist/glimt-*-x86_64.AppImage
+            dist/glimt-*-x86_64.AppImage.sha256
+          if-no-files-found: error
+
   release:
+    needs: appimage
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -36,21 +90,14 @@ jobs:
             keep-outputs = true
 
       # The same key formula as the CI workflow. A tag points at a commit main already
-      # built, so every derivation below is a restore rather than a compile.
+      # built, so every derivation below is a restore rather than a compile. The
+      # AppImage cache is separate; this job does not need that closure.
       - name: Restore and save Nix store
         uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7.0.2, 2026-01-30
         with:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock', '**/Cargo.lock') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
-          # 4.4 GiB is what the flake check and the dev shell need together, measured with
-          # `nix path-info` over the union closure: the toolchain, GTK, Wayland and the
-          # five hundred per-crate outputs. A 2G budget evicted more than half of that
-          # before the cache was written, so every run recompiled what the last one built.
           gc-max-store-size-linux: 6G
-          purge: true
-          purge-prefixes: nix-${{ runner.os }}-
-          purge-created: 0
-          purge-last-accessed: P1DT12H
           purge-primary-key: never
 
       # Gate the release on the same checks CI runs, so a tag can never publish
@@ -64,12 +111,11 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || !inputs.appimage_only }}
         run: nix develop -c just lock-check crate2nix-check
 
-      # The AppImage is the artifact that has to run on a machine without Nix, so it is
-      # built and smoke-tested first. The static client is a separate musl compilation
-      # and takes most of the release time; doing it after the AppImage means a broken
-      # wrapper fails the job in minutes instead of after the client build.
-      - name: Build the dashboard AppImage
-        run: nix develop -c just appimage "${RELEASE_VERSION}"
+      - name: Download the AppImage
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2, 2026-10-07
+        with:
+          name: appimage
+          path: dist
 
       # Ubuntu 24.04 and later restrict unprivileged user namespaces with AppArmor by
       # default. nix-appimage's AppRun creates a user namespace and writes uid_map, so
