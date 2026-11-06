@@ -45,7 +45,7 @@
       # The first pass only trims data; nixpkgs re-evaluates the packages above these
       # against the trimmed versions.
       trimmedPkgs = pkgs.extend (
-        final: prev: {
+        _final: prev: {
           glib = withoutLocales prev.glib;
           isocodes = withoutLocales prev.isocodes;
           gdk-pixbuf = withoutLocales prev.gdk-pixbuf;
