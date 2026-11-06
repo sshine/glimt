@@ -1,8 +1,9 @@
 //! The session's light or dark preference, as the desktop reports it.
 //!
-//! The dashboard does not own a theme switch. The desktop has one already, and the
-//! point of following it is that the dashboard looks like the rest of the session when
-//! it appears rather than like the one application that did not get the message.
+//! Following the desktop is the default. It has a preference already, and the point of
+//! following it is that the dashboard looks like the rest of the session when it
+//! appears rather than like the one application that did not get the message. A
+//! frontend may force a palette instead, and then has no reason to call [`watch`].
 //!
 //! The XDG settings portal is the source: `org.freedesktop.appearance` carries
 //! `color-scheme` on every desktop that implements the setting, and GNOME additionally

@@ -33,6 +33,10 @@ struct Cli {
     #[arg(long, value_enum, default_value_t = Mode::Window)]
     mode: Mode,
 
+    /// Which palette to paint. The default follows the desktop's own preference.
+    #[arg(long, value_enum, default_value_t = Theme::Auto)]
+    theme: Theme,
+
     /// Preferred global shortcut, spelled the way the portal spells one.
     #[arg(long, default_value = "SUPER+space")]
     trigger: String,
@@ -72,6 +76,16 @@ enum Mode {
     /// A fullscreen toplevel with a translucent backdrop, which is the only way to
     /// control where the dashboard appears on a compositor without layer-shell.
     Fullscreen,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum Theme {
+    /// Follow the desktop's light or dark preference.
+    Auto,
+    /// Always paint the light palette.
+    Light,
+    /// Always paint the dark palette.
+    Dark,
 }
 
 /// Posts into GTK's loop from the worker threads.
@@ -124,7 +138,12 @@ fn main() -> anyhow::Result<()> {
     let state = Rc::new(RefCell::new(initial));
 
     let display = gdk4::Display::default().context("no display")?;
-    let palette = Palette::for_scheme(appearance::current());
+    let scheme = match cli.theme {
+        Theme::Auto => appearance::current(),
+        Theme::Light => appearance::Scheme::Light,
+        Theme::Dark => appearance::Scheme::Dark,
+    };
+    let palette = Palette::for_scheme(scheme);
     let provider = gtk::CssProvider::new();
     provider.load_from_string(&style::sheet(&palette));
     gtk::style_context_add_provider_for_display(
@@ -170,7 +189,9 @@ fn main() -> anyhow::Result<()> {
             .context("starting the service thread")?;
     }
 
-    {
+    // Only an automatic choice needs to hear about later changes; a forced palette
+    // stays what it was asked to be for the life of the process.
+    if cli.theme == Theme::Auto {
         let waker = Arc::clone(&waker);
         appearance::watch(waker).context("starting the appearance watch")?;
     }

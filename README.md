@@ -61,9 +61,10 @@ shortcut, the design tokens and the light and dark palettes, and `glimt-proto` t
 names a client needs. The frontend translates key events into that vocabulary and
 renders the result.
 
-The dashboard has no theme switch of its own: it follows the session's light or dark
-preference through the XDG settings portal, including the common case where the session
-is dark through its GTK theme rather than through `color-scheme`. The palette is
+By default the dashboard follows the session's light or dark preference through the
+XDG settings portal, including the common case where the session is dark through its GTK
+theme rather than through `color-scheme`. `--theme light` and `--theme dark` force a
+palette; `--theme auto` is the default. While following the session, the palette is
 reloaded in place, so switching while the daemon is resident repaints the window.
 
 The comparison that led to GTK4 is kept as history in
@@ -131,6 +132,7 @@ The options:
 | `package` | `pkgs.glimt` | the dashboard to run |
 | `shortcut` | `<Super>Return` | GNOME's notation; null leaves the keyboard alone |
 | `months` | `6` | a count that divides the year aligns to its block |
+| `theme` | `auto` | `auto` follows the desktop; `light` or `dark` forces one |
 | `portal` | `false` | register the shortcut through the portal instead |
 | `trigger` | `SUPER+Return` | what to ask the portal for, in its notation |
 | `extraArgs` | `[ ]` | anything else for the daemon's command line |

@@ -76,7 +76,9 @@ window.glimt {{ background-color: {background}; font-family: {font}; }}
 .month          {{ border-left: 1px solid {rule}; }}
 .month-heading  {{ font-size: {month_heading}px; font-weight: 700; color: {ink}; }}
 
-.row        {{ font-size: {month_row}px; color: {ink}; }}
+/* Every row reserves the same border, in transparent ink, so that moving the focus
+   from one week to the next repaints the border rather than reflowing the rows. */
+.row        {{ border: 2px solid transparent; font-size: {month_row}px; color: {ink}; }}
 .row.shaded {{ background-color: {shade}; }}
 .row .week  {{ font-weight: 700; }}
 .row .holiday {{ font-size: {holiday}px; color: {muted}; }}
@@ -91,9 +93,9 @@ window.glimt {{ background-color: {background}; font-family: {font}; }}
 
 /* The reference draws one box around the whole run of seven rows, so the sides are on
    every row of it and the ends carry the cap. */
-.row.focus        {{ border-left: 2px solid {accent}; border-right: 2px solid {accent}; }}
-.row.focus-first  {{ border-top: 2px solid {accent}; }}
-.row.focus-last   {{ border-bottom: 2px solid {accent}; }}
+.row.focus        {{ border-left-color: {accent}; border-right-color: {accent}; }}
+.row.focus-first  {{ border-top-color: {accent}; }}
+.row.focus-last   {{ border-bottom-color: {accent}; }}
 
 .bar        {{ background-color: {bar_fill}; border-radius: {bar_radius}px;
                padding: 0 14px; }}

@@ -38,6 +38,8 @@
       arguments = [
         "--months"
         (toString cfg.months)
+        "--theme"
+        cfg.theme
       ]
       ++ lib.optionals cfg.portal [
         "--trigger"
@@ -73,6 +75,19 @@
             Months in the overview. Six is the half year the reference calendar prints.
             A count that divides the year aligns to its block, so three gives the
             quarter and twelve the year.
+          '';
+        };
+
+        theme = lib.mkOption {
+          type = lib.types.enum [
+            "auto"
+            "light"
+            "dark"
+          ];
+          default = "auto";
+          description = ''
+            Which palette the dashboard paints. `auto` follows the desktop's light or
+            dark preference; the other two force one palette.
           '';
         };
 
