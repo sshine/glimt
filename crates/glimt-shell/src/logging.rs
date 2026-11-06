@@ -1,4 +1,4 @@
-//! One logging setup for both candidates.
+//! One logging setup for the dashboard.
 //!
 //! The Scheme runtime JIT compiles through cranelift, which reports every function it
 //! defines at info level, in cranelift's own IR. That is a page of output per
@@ -7,7 +7,7 @@
 
 use tracing_subscriber::EnvFilter;
 
-const DEFAULT: &str = "warn,glimt_shell=info,napkin_math=info,glimt=info,glimt_raw=info";
+const DEFAULT: &str = "warn,glimt_shell=info,napkin_math=info,glimt=info";
 
 pub fn init() {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(DEFAULT));

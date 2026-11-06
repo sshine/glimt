@@ -47,9 +47,9 @@ jobs:
       - name: Verify Cargo.lock and Cargo.nix
         run: nix develop -c just lock-check crate2nix-check
 
-      # The client is the only static binary. The dashboard links GTK, or Wayland and
-      # fontconfig, so a static musl build of it is not a thing that exists; `just dist`
-      # also builds it as an AppImage with its whole runtime closure.
+      # The client is the only static binary. The dashboard links GTK, so a static musl
+      # build of it is not a thing that exists; `just dist` also builds it as an
+      # AppImage with its whole runtime closure.
       #
       # This is the one step that shares nothing with the check above: a crate compiled
       # for musl is a different compilation from the same crate compiled for the host,

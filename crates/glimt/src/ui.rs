@@ -1,9 +1,7 @@
 //! The widget tree, and how it is kept up to date.
 //!
-//! Built once and changed in place. That is the half of this candidate worth measuring:
-//! a keystroke sets a few labels and toggles a few style classes, and GTK works out
-//! which pixels that touched. The other spike has to decide that for itself, and the
-//! difference in how much code each of those takes is part of the answer.
+//! Built once and changed in place. A keystroke sets a few labels and toggles a few
+//! style classes, and GTK works out which pixels that touched.
 //!
 //! The month rows are rebuilt only when the six months on show change, which happens
 //! when the selection walks off the end of a half year. Everything else a key can do
@@ -369,7 +367,7 @@ fn set_class(widget: &impl IsA<gtk::Widget>, class: &str, wanted: bool) {
 /// What has been typed, with the caret after it when it is showing.
 ///
 /// Appended rather than drawn beside, so the text in front of it does not shift as it
-/// blinks, and so both frontends put exactly the same glyph in the same place.
+/// blinks.
 fn caret(bar: &glimt_shell::Bar<'_>) -> String {
     match bar.cursor {
         true => format!("{}{}", bar.input, theme::CURSOR),

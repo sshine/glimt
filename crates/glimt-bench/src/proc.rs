@@ -1,10 +1,10 @@
 //! What the kernel will say about a running candidate.
 //!
-//! Resident size is read as both RSS and PSS because the two candidates are not
-//! comparable on RSS alone: GTK's libraries are already mapped into the GNOME session,
-//! so a large part of what RSS attributes to the process is shared with programs that
-//! would be running anyway. PSS divides that by the number of processes sharing it,
-//! which is the figure that answers "what does keeping this resident cost".
+//! Resident size is read as both RSS and PSS because RSS alone overstates the cost:
+//! GTK's libraries are already mapped into the GNOME session, so a large part of what
+//! RSS attributes to the process is shared with programs that would be running anyway.
+//! PSS divides that by the number of processes sharing it, which is the figure that
+//! answers "what does keeping this resident cost".
 
 use std::fs;
 

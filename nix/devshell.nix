@@ -32,7 +32,7 @@
           inputs.crate2nix.packages.${system}.default
           # Reading the benchmark output by hand.
           pkgs.jq
-          # The portability check runs the frontends under a nested wlroots compositor on
+          # The portability check runs the dashboard under a nested wlroots compositor on
           # its headless backend, which is the only way to exercise layer-shell without
           # leaving GNOME and without taking over the screen.
           pkgs.sway

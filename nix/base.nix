@@ -5,8 +5,7 @@
   dendritic-base = {
     root = ../.;
 
-    # The GTK frontend is what the dashboard is; the other is the control it is measured
-    # against. Both are built, and this is the one `nix run` and the module install.
+    # The GTK frontend is the dashboard, and the one `nix run` and the module install.
     rust.defaultCrate = "glimt";
 
     # Puts a cross linker on PATH so `just dist` can build the client for both

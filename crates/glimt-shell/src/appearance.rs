@@ -1,8 +1,8 @@
 //! The session's light or dark preference, as the desktop reports it.
 //!
-//! Neither candidate owns a theme switch. The desktop has one already, and the point of
-//! following it is that the dashboard looks like the rest of the session when it appears
-//! rather than like the one application that did not get the message.
+//! The dashboard does not own a theme switch. The desktop has one already, and the
+//! point of following it is that the dashboard looks like the rest of the session when
+//! it appears rather than like the one application that did not get the message.
 //!
 //! The XDG settings portal is the source: `org.freedesktop.appearance` carries
 //! `color-scheme` on every desktop that implements the setting, and GNOME additionally
@@ -80,7 +80,7 @@ fn connect() -> anyhow::Result<zbus::blocking::Connection> {
 /// Follow the desktop's preference for the life of the process.
 ///
 /// The watcher runs on its own thread and reaches the toolkit loop through the same
-/// [`Waker`] as the D-Bus service, so neither frontend needs a second channel. A portal
+/// [`Waker`] as the D-Bus service, so the frontend needs no second channel. A portal
 /// that is not up yet, or that restarts, is retried; a change that arrives before the
 /// first read only costs a repeated, identical message, which the frontend ignores.
 pub fn watch(waker: Arc<dyn Waker>) -> std::io::Result<()> {

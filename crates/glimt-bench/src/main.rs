@@ -213,8 +213,8 @@ fn main() -> anyhow::Result<()> {
 ///
 /// The draining has to continue after the ready line: the read end of the pipe closing
 /// turns the candidate.s next log write into a broken pipe, which kills it partway
-/// through a run. The geometry is carried into the report so that two candidates cannot
-/// be compared without it being visible that they drew the same size.
+/// through a run. The geometry is carried into the report so a change in the drawn size
+/// cannot slip past unnoticed.
 fn drain_log(stderr: std::process::ChildStderr) -> mpsc::Receiver<String> {
     let (sender, receiver) = mpsc::channel();
 

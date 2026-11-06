@@ -55,9 +55,7 @@
           default = pkgs.glimt;
           defaultText = lib.literalExpression "pkgs.glimt";
           description = ''
-            The frontend to run. `pkgs.glimt` is the GTK one and what you want;
-            `pkgs.glimt-raw` is the same dashboard drawn without a toolkit, kept as the
-            control the GTK one is measured against.
+            The dashboard to run. `pkgs.glimt` is the GTK frontend and what you want.
           '';
         };
 
@@ -120,8 +118,8 @@
       };
 
       config = lib.mkIf cfg.enable {
-        # Both: the first carries glimtctl, the second the two frontends, which need
-        # native inputs the first knows nothing about. Order matters.
+        # Both: the first carries glimtctl, the second the dashboard, which needs native
+        # inputs the first knows nothing about. Order matters.
         nixpkgs.overlays = [
           inputs.self.overlays.default
           inputs.self.overlays.frontends

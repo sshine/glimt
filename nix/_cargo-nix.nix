@@ -3,7 +3,7 @@
 # Shared between the builds and the lint check so the two cannot diverge. The linting
 # flavour differs only in what it sets on the workspace's own crates, which is the whole
 # point: every third-party dependency keeps the store path the plain flavour gave it, so
-# linting costs the eight crates here rather than the four hundred below them.
+# linting costs the seven crates here rather than the four hundred below them.
 #
 # `buildRustCrate` drives rustc directly rather than through cargo, so linting is a matter
 # of swapping the driver for clippy-driver rather than of running `cargo clippy`.
@@ -18,9 +18,8 @@
 let
   # What nixpkgs' defaultCrateOverrides does not already carry.
   #
-  # The GTK stack is covered there down to gdk4-sys; the layer-shell binding, the three
-  # crates that reach Wayland and xkbcommon through pkg-config, and the two frontends
-  # themselves are not.
+  # The GTK stack is covered there down to gdk4-sys; the layer-shell binding and the
+  # dashboard itself are not.
   nativeOverrides =
     p:
     let
@@ -35,34 +34,12 @@ let
         ];
       };
 
-      wayland-sys = _attrs: {
-        nativeBuildInputs = [ p.pkg-config ];
-        buildInputs = [ p.wayland ];
-      };
-
-      xkbcommon = _attrs: {
-        nativeBuildInputs = [ p.pkg-config ];
-        buildInputs = [ p.libxkbcommon ];
-      };
-
-      smithay-client-toolkit = _attrs: {
-        nativeBuildInputs = [ p.pkg-config ];
-        buildInputs = [ p.libxkbcommon ];
-      };
-
       glimt = _attrs: {
         nativeBuildInputs = gui.gtkNativeBuildInputs;
-        buildInputs = gui.crateInputs.glimt;
-      };
-
-      glimt-raw = _attrs: {
-        nativeBuildInputs = gui.nativeBuildInputs;
-        buildInputs = gui.crateInputs.glimt-raw;
-        # winit and the wayland crates dlopen rather than link, so the rpath the fixup
-        # phase derives does not cover them.
-        postFixup = ''
-          patchelf --add-rpath ${gui.libraryPath} $out/bin/glimt-raw
-        '';
+        buildInputs = gui.buildInputs;
+        # Rust emits a symbol table even without debug info, and stdenv's default only
+        # strips debug sections. The table is most of the binary.
+        stripAllList = [ "bin" ];
       };
     };
 

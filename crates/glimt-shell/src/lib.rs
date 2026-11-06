@@ -1,10 +1,10 @@
-//! Everything the two spikes share below the drawing.
+//! Everything the dashboard needs below the drawing.
 //!
 //! A graphics toolkit owns the main thread and will not give it back, so the daemon is
 //! split: the toolkit's own loop stays on the main thread, and D-Bus and the global
-//! shortcut run on a worker that reaches the loop through a [`Waker`] the spike
-//! supplies. What is left is identical between the two candidates, which is the point.
-//! A difference in the measurements then has only one place left to come from.
+//! shortcut run on a worker that reaches the loop through a [`Waker`] the frontend
+//! supplies. The calendar, the calculator and the state machine are shared so the
+//! daemon and the client agree without either one owning them.
 
 use std::sync::{Arc, Mutex};
 

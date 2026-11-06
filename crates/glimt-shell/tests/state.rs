@@ -1,7 +1,7 @@
 //! The two levels, and what each key does at each of them.
 //!
 //! None of this needs a compositor, which is the point of it being here rather than in
-//! either frontend.
+//! the frontend.
 
 // `allow-expect-in-tests` reaches the bodies of the `#[test]` functions below, but not
 // the helpers above them, which are ordinary items of the test crate.

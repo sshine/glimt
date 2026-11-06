@@ -21,23 +21,10 @@ hide:
 toggle:
     cargo run -q -p glimtctl -- toggle
 
-# Measure one candidate. Release, because a debug build measures the profile.
+# Measure the dashboard. Release, because a debug build measures the profile.
 bench candidate='glimt' iterations='200' mode='window':
     cargo build --release -p {{candidate}} -p glimt-bench
     ./target/release/glimt-bench --candidate {{candidate}} --iterations {{iterations}} --mode {{mode}}
-
-# Measure both, one after the other rather than at once: two daemons would compete for
-# the same bus name, and a loaded machine would be measured instead of a toolkit.
-bench-all iterations='200':
-    just bench glimt {{iterations}}
-    just bench glimt-raw {{iterations}}
-
-# Print the two reports side by side
-compare:
-    @jq -s '.[] | {candidate, mode, geometry, cold_ms: (.cold_start_us/1000), \
-        pss_mb: (.idle.pss_kb/1024), rss_mb: (.idle.rss_kb/1024), \
-        p50_ms: (.latency.p50_us/1000), p95_ms: (.latency.p95_us/1000), \
-        p99_ms: (.latency.p99_us/1000)}' bench-results/*.json
 
 # The layer-shell check, without leaving GNOME and without taking the screen.
 #
@@ -45,7 +32,7 @@ compare:
 # the headless backend means it opens no window at all. A candidate that works here
 # works on niri, Hyprland, sway and COSMIC. cage will not do: it is a kiosk compositor
 # and leaves layer-shell out on purpose.
-nested args='--mode layer-shell' candidate='glimt-raw':
+nested args='--layer-shell' candidate='glimt':
     #!/usr/bin/env bash
     set -euo pipefail
     cargo build --release -p {{candidate}}
@@ -57,10 +44,6 @@ nested args='--mode layer-shell' candidate='glimt-raw':
     WLR_BACKENDS=headless WLR_LIBINPUT_NO_DEVICES=1 XDG_CURRENT_DESKTOP=sway \
         timeout 25 sway --config "$conf" >/dev/null 2>&1 || true
     cat "$log"
-
-# The same for the GTK candidate, which reaches layer-shell through its own library
-nested-gtk4:
-    just nested --layer-shell glimt
 
 # Which Wayland protocols the compositor of the day offers
 protocols:
@@ -108,7 +91,7 @@ crate2nix-check:
       exit 1
     fi
 
-# Formatting, lints, tests, both frontends and the NixOS module, in one cached pass
+# Formatting, lints, tests, the dashboard and the NixOS module, in one cached pass
 check *args:
     nix flake check -L {{args}}
 
@@ -127,9 +110,9 @@ check-version version:
 
 # Build the static client and its checksums into dist/.
 #
-# Only the client is a static binary. The dashboard links GTK, or Wayland and fontconfig,
-# so a static musl build of it is not a thing that exists; it ships as the AppImage that
-# `appimage` adds to the same directory.
+# Only the client is a static binary. The dashboard links GTK, so a static musl build of
+# it is not a thing that exists; it ships as the AppImage that `appimage` adds to the
+# same directory.
 dist version: (check-version version)
     rm -rf dist && mkdir -p dist
     set -e; for target in {{release_targets}}; do \

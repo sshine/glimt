@@ -1,10 +1,9 @@
 //! What the dashboard is showing, and what a key does to it.
 //!
-//! Both frontends own their own main loop and their own idea of a key event, and
-//! neither owns any of this. They translate a key into an [`Action`], hand it over, and
-//! do what the [`Response`] says. Everything between those two points is written once
-//! and tested without a compositor, which is what makes maintaining two frontends
-//! affordable.
+//! The frontend owns the main loop and the idea of a key event, and none of this. It
+//! translates a key into an [`Action`], hands it over, and does what the [`Response`]
+//! says. Everything between those two points is written once and tested without a
+//! compositor.
 //!
 //! There are two levels, and they are told apart by whether anything has been typed.
 //! Escape goes one level back: it clears the input, and at the top it dismisses the

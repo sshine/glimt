@@ -1,10 +1,10 @@
-//! Candidate A: the dashboard drawn with GTK4.
+//! The dashboard, drawn with GTK4.
 //!
 //! The process stays resident and the window stays built. Showing it is a map and
 //! hiding it is an unmap, so nothing between the two costs anything at the moment the
-//! key is pressed. What this candidate cannot avoid is that GTK unrealizes a hidden
-//! window, which throws away the GSK renderer; whether that is measurable against
-//! mutter's own map animation is the question the benchmark answers.
+//! key is pressed. What GTK cannot avoid is that it unrealizes a hidden window, which
+//! throws away the GSK renderer; whether that is measurable against mutter's own map
+//! animation is the question the benchmark answers.
 
 mod style;
 mod ui;
@@ -255,7 +255,7 @@ fn apply_layer_shell(window: &gtk::Window) {
 /// GTK's key events, translated into the shared vocabulary.
 ///
 /// Everything this file decides about the keyboard is here: which key is which action.
-/// What an action does lives in `glimt-shell` and is the same for both candidates.
+/// What an action does lives in `glimt-shell`, away from the toolkit.
 /// Everything the callbacks need, in one place.
 ///
 /// GTK hands a closure nothing, so each one has to carry what it will need, and the
@@ -279,8 +279,7 @@ impl App {
     /// GTK's key events, translated into the shared vocabulary.
     ///
     /// Everything this file decides about the keyboard is here: which key is which
-    /// action. What an action does lives in `glimt-shell` and is the same for both
-    /// frontends.
+    /// action. What an action does lives in `glimt-shell`, away from the toolkit.
     fn install_keys(&self) {
         let keys = gtk::EventControllerKey::new();
         let app = self.clone();
@@ -484,7 +483,7 @@ fn observe(clock: &gdk4::FrameClock, timing: &Rc<RefCell<Timing>>, recorder: &Re
 ///
 /// The loop has to run first: before the window has been through a frame its widgets
 /// have no allocation, and a paintable over them renders nothing at all. Drawn at scale
-/// 2 so the two candidates' images can be put side by side.
+/// 2 so the image matches the output it is meant to represent.
 fn screenshot(window: &gtk::Window, path: &std::path::Path) -> anyhow::Result<()> {
     window.present();
 

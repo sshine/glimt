@@ -41,7 +41,7 @@ jobs:
           purge-last-accessed: P1DT12H
           purge-primary-key: never
 
-      # Formatting, clippy, the tests, both frontends, the client and the NixOS module,
+      # Formatting, clippy, the tests, the dashboard, the client and the NixOS module,
       # in one pass over one set of per-crate derivations. Running clippy and the tests
       # through cargo in the dev shell instead would compile the workspace twice more,
       # into a target/ directory nothing caches between runs.

@@ -83,16 +83,6 @@ rec {
       # File a bug if you depend on any for non-debug work!
       debug = internal.debugCrate { inherit packageId; };
     };
-    "glimt-raw" = rec {
-      packageId = "glimt-raw";
-      build = internal.buildRustCrateWithFeatures {
-        packageId = "glimt-raw";
-      };
-
-      # Debug support which might change between releases.
-      # File a bug if you depend on any for non-debug work!
-      debug = internal.debugCrate { inherit packageId; };
-    };
     "glimt-shell" = rec {
       packageId = "glimt-shell";
       build = internal.buildRustCrateWithFeatures {
@@ -403,33 +393,6 @@ rec {
         features = {
           "derive" = [ "derive_arbitrary" ];
           "derive_arbitrary" = [ "dep:derive_arbitrary" ];
-        };
-      };
-      "arrayref" = rec {
-        crateName = "arrayref";
-        version = "0.3.9";
-        edition = "2015";
-        sha256 = "1jzyp0nvp10dmahaq9a2rnxqdd5wxgbvp8xaibps3zai8c9fi8kn";
-        license = "BSD-2-Clause";
-        authors = [
-          "David Roundy <roundyd@physics.oregonstate.edu>"
-        ];
-
-      };
-      "arrayvec" = rec {
-        crateName = "arrayvec";
-        version = "0.7.8";
-        edition = "2018";
-        sha256 = "0mmd8lrijbvg1qp4c5zis5dq41a3mjv2rb6bxkyj9kwaw2k6gyyk";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "bluss"
-        ];
-        features = {
-          "borsh" = [ "dep:borsh" ];
-          "default" = [ "std" ];
-          "serde" = [ "dep:serde" ];
-          "zeroize" = [ "dep:zeroize" ];
         };
       };
       "async-broadcast" = rec {
@@ -1049,13 +1012,6 @@ rec {
         authors = [
           "Lokathor <zefria@gmail.com>"
         ];
-        dependencies = [
-          {
-            name = "bytemuck_derive";
-            packageId = "bytemuck_derive";
-            optional = true;
-          }
-        ];
         features = {
           "bytemuck_derive" = [ "dep:bytemuck_derive" ];
           "derive" = [ "bytemuck_derive" ];
@@ -1065,33 +1021,6 @@ rec {
           "nightly_portable_simd" = [ "rustversion" ];
           "rustversion" = [ "dep:rustversion" ];
         };
-        resolvedDefaultFeatures = [ "aarch64_simd" "bytemuck_derive" "derive" "extern_crate_alloc" "min_const_generics" ];
-      };
-      "bytemuck_derive" = rec {
-        crateName = "bytemuck_derive";
-        version = "1.12.1";
-        edition = "2018";
-        sha256 = "17379imphax0d85jzkc50acw746mw89hjbrxqxlw1wmnhxjqj7va";
-        procMacro = true;
-        license = "Zlib OR Apache-2.0 OR MIT";
-        authors = [
-          "Lokathor <zefria@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "proc-macro2";
-            packageId = "proc-macro2";
-          }
-          {
-            name = "quote";
-            packageId = "quote";
-          }
-          {
-            name = "syn";
-            packageId = "syn 3.0.9";
-          }
-        ];
-
       };
       "bytes" = rec {
         crateName = "bytes";
@@ -1197,89 +1126,6 @@ rec {
           "xlib" = [ "x11" ];
         };
         resolvedDefaultFeatures = [ "glib-sys" "use_glib" ];
-      };
-      "calloop" = rec {
-        crateName = "calloop";
-        version = "0.14.5";
-        edition = "2024";
-        sha256 = "0pjf9fmgq3zf3fnbcb3w9cml19lr0vv9pvhpklf75j1px49j7cs3";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "polling";
-            packageId = "polling";
-          }
-          {
-            name = "rustix";
-            packageId = "rustix";
-            usesDefaultFeatures = false;
-            features = [ "event" "fs" "pipe" "std" ];
-          }
-          {
-            name = "tracing";
-            packageId = "tracing";
-            usesDefaultFeatures = false;
-            features = [ "log" ];
-          }
-        ];
-        devDependencies = [
-          {
-            name = "rustix";
-            packageId = "rustix";
-            usesDefaultFeatures = false;
-            features = [ "net" ];
-          }
-        ];
-        features = {
-          "async-task" = [ "dep:async-task" ];
-          "executor" = [ "async-task" "dep:slab" ];
-          "futures-core" = [ "dep:futures-core" ];
-          "futures-io" = [ "dep:futures-io" ];
-          "nix" = [ "dep:nix" ];
-          "signals" = [ "nix" ];
-          "stream" = [ "futures-core" ];
-        };
-      };
-      "calloop-wayland-source" = rec {
-        crateName = "calloop-wayland-source";
-        version = "0.4.1";
-        edition = "2021";
-        sha256 = "1yi1c23naqhd8m94q3v366s4cak8l50zy7ldrkqfn0hajkqgr3hk";
-        libName = "calloop_wayland_source";
-        license = "MIT";
-        authors = [
-          "Kirill Chibisov <contact@kchibisov.com>"
-        ];
-        dependencies = [
-          {
-            name = "calloop";
-            packageId = "calloop";
-          }
-          {
-            name = "rustix";
-            packageId = "rustix";
-            usesDefaultFeatures = false;
-            features = [ "std" ];
-          }
-          {
-            name = "wayland-backend";
-            packageId = "wayland-backend";
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-          }
-        ];
-        features = {
-          "log" = [ "dep:log" ];
-        };
       };
       "cc" = rec {
         crateName = "cc";
@@ -1614,128 +1460,6 @@ rec {
           "default" = [ "link" ];
         };
         resolvedDefaultFeatures = [ "default" "link" ];
-      };
-      "core_maths" = rec {
-        crateName = "core_maths";
-        version = "0.1.1";
-        edition = "2015";
-        sha256 = "0c0dv11ixxpc9bsx5xasvl98mb1dlprzcm6qq6ls3nsygw0mwx3p";
-        license = "MIT";
-        authors = [
-          "Robert Bastian <me@robertbastian.dev"
-        ];
-        dependencies = [
-          {
-            name = "libm";
-            packageId = "libm";
-          }
-        ];
-
-      };
-      "cosmic-text" = rec {
-        crateName = "cosmic-text";
-        version = "0.19.0";
-        edition = "2021";
-        sha256 = "0wys9shmdcibqacxl3qy50z5h48ff2xbx8j87zhlr4qda64bc5xy";
-        libName = "cosmic_text";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "Jeremy Soller <jeremy@system76.com>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "fontdb";
-            packageId = "fontdb";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "harfrust";
-            packageId = "harfrust";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "linebender_resource_handle";
-            packageId = "linebender_resource_handle";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "log";
-            packageId = "log";
-          }
-          {
-            name = "rangemap";
-            packageId = "rangemap";
-          }
-          {
-            name = "rustc-hash";
-            packageId = "rustc-hash";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "self_cell";
-            packageId = "self_cell";
-          }
-          {
-            name = "skrifa";
-            packageId = "skrifa 0.40.0";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "smol_str";
-            packageId = "smol_str";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "swash";
-            packageId = "swash";
-            optional = true;
-            usesDefaultFeatures = false;
-            features = [ "render" "scale" ];
-          }
-          {
-            name = "sys-locale";
-            packageId = "sys-locale";
-            optional = true;
-          }
-          {
-            name = "unicode-bidi";
-            packageId = "unicode-bidi";
-            usesDefaultFeatures = false;
-            features = [ "hardcoded-data" ];
-          }
-          {
-            name = "unicode-linebreak";
-            packageId = "unicode-linebreak";
-          }
-          {
-            name = "unicode-script";
-            packageId = "unicode-script";
-          }
-          {
-            name = "unicode-segmentation";
-            packageId = "unicode-segmentation";
-          }
-        ];
-        features = {
-          "core_maths" = [ "dep:core_maths" ];
-          "cosmic_undo_2" = [ "dep:cosmic_undo_2" ];
-          "default" = [ "std" "swash" "fontconfig" ];
-          "fontconfig" = [ "fontdb/fontconfig" "std" ];
-          "hashbrown" = [ "dep:hashbrown" ];
-          "modit" = [ "dep:modit" ];
-          "no_std" = [ "hashbrown" "dep:libm" "skrifa/libm" "core_maths" "swash?/libm" ];
-          "std" = [ "fontdb/memmap" "fontdb/std" "harfrust/std" "linebender_resource_handle/std" "skrifa/std" "swash?/std" "sys-locale" "unicode-bidi/std" ];
-          "swash" = [ "dep:swash" ];
-          "syntect" = [ "dep:syntect" ];
-          "sys-locale" = [ "dep:sys-locale" ];
-          "vi" = [ "modit" "syntect" "cosmic_undo_2" ];
-          "wasm-web" = [ "sys-locale?/js" ];
-        };
-        resolvedDefaultFeatures = [ "default" "fontconfig" "std" "swash" "sys-locale" ];
       };
       "cpufeatures" = rec {
         crateName = "cpufeatures";
@@ -2338,7 +2062,7 @@ rec {
         features = {
           "default" = [ "std" ];
         };
-        resolvedDefaultFeatures = [ "default" "std" ];
+        resolvedDefaultFeatures = [ "std" ];
       };
       "crossbeam-utils" = rec {
         crateName = "crossbeam-utils";
@@ -2373,23 +2097,6 @@ rec {
           "rand_core" = [ "dep:rand_core" ];
           "zeroize" = [ "hybrid-array/zeroize" ];
         };
-      };
-      "cursor-icon" = rec {
-        crateName = "cursor-icon";
-        version = "1.2.0";
-        edition = "2021";
-        sha256 = "0bvkw7ak1mqwcpkgd9lh7n00hcvlh87jfl7188f231nz6zfy2ypj";
-        libName = "cursor_icon";
-        license = "MIT OR Apache-2.0 OR Zlib";
-        authors = [
-          "Kirill Chibisov <contact@kchibisov.com>"
-        ];
-        features = {
-          "default" = [ "std" ];
-          "serde" = [ "dep:serde" ];
-          "std" = [ "alloc" ];
-        };
-        resolvedDefaultFeatures = [ "alloc" "default" "std" ];
       };
       "darling" = rec {
         crateName = "darling";
@@ -2616,22 +2323,6 @@ rec {
           "zeroize" = [ "dep:zeroize" "block-buffer?/zeroize" ];
         };
         resolvedDefaultFeatures = [ "alloc" "block-api" "default" "oid" ];
-      };
-      "downcast-rs" = rec {
-        crateName = "downcast-rs";
-        version = "1.2.1";
-        edition = "2015";
-        sha256 = "1lmrq383d1yszp7mg5i7i56b17x2lnn3kb91jwsq0zykvg2jbcvm";
-        libName = "downcast_rs";
-        license = "MIT/Apache-2.0";
-        authors = [
-          "Ashish Myles <marcianx@gmail.com>"
-          "Runji Wang <wangrunji0408@163.com>"
-        ];
-        features = {
-          "default" = [ "std" ];
-        };
-        resolvedDefaultFeatures = [ "default" "std" ];
       };
       "either" = rec {
         crateName = "either";
@@ -2918,23 +2609,6 @@ rec {
         ];
 
       };
-      "fdeflate" = rec {
-        crateName = "fdeflate";
-        version = "0.3.7";
-        edition = "2021";
-        sha256 = "130ga18vyxbb5idbgi07njymdaavvk6j08yh1dfarm294ssm6s0y";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "The image-rs Developers"
-        ];
-        dependencies = [
-          {
-            name = "simd-adler32";
-            packageId = "simd-adler32";
-          }
-        ];
-
-      };
       "field-offset" = rec {
         crateName = "field-offset";
         version = "0.3.6";
@@ -2987,7 +2661,7 @@ rec {
           }
           {
             name = "miniz_oxide";
-            packageId = "miniz_oxide 0.9.1";
+            packageId = "miniz_oxide";
             optional = true;
             features = [ "simd" ];
           }
@@ -3046,121 +2720,6 @@ rec {
         features = {
           "default" = [ "std" ];
         };
-      };
-      "font-types 0.11.3" = rec {
-        crateName = "font-types";
-        version = "0.11.3";
-        edition = "2021";
-        sha256 = "1mygnhm4xrnm803w2ax63ka3nm0s56l4h26mrs9xkbbdby8ssf2v";
-        libName = "font_types";
-        license = "MIT OR Apache-2.0";
-        dependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-            optional = true;
-            features = [ "derive" "min_const_generics" ];
-          }
-        ];
-        features = {
-          "bytemuck" = [ "dep:bytemuck" ];
-          "serde" = [ "dep:serde" ];
-        };
-        resolvedDefaultFeatures = [ "bytemuck" "std" ];
-      };
-      "font-types 0.12.7" = rec {
-        crateName = "font-types";
-        version = "0.12.7";
-        edition = "2021";
-        sha256 = "0pgks8skqzhjidjpxkyp154rl335pjf7yf6ydh17jjj6h7byjnl3";
-        libName = "font_types";
-        license = "MIT OR Apache-2.0";
-        dependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-            optional = true;
-            features = [ "derive" "min_const_generics" ];
-          }
-        ];
-        features = {
-          "bytemuck" = [ "dep:bytemuck" ];
-          "serde" = [ "dep:serde" ];
-        };
-        resolvedDefaultFeatures = [ "bytemuck" "std" ];
-      };
-      "fontconfig-parser" = rec {
-        crateName = "fontconfig-parser";
-        version = "0.5.8";
-        edition = "2018";
-        sha256 = "0ijnbzg31sl6v49g7q2l7sl76hjj8z0hvlsz77cdvm029vi77ixv";
-        libName = "fontconfig_parser";
-        license = "MIT";
-        dependencies = [
-          {
-            name = "roxmltree";
-            packageId = "roxmltree 0.20.0";
-          }
-        ];
-        features = {
-          "log" = [ "dep:log" ];
-          "serde" = [ "dep:serde" ];
-          "serialize" = [ "serde" ];
-        };
-      };
-      "fontdb" = rec {
-        crateName = "fontdb";
-        version = "0.23.0";
-        edition = "2018";
-        sha256 = "0199vry9x8zn9ix4x4rqvv53dy2ryhy68l53jwr580hj7ndphzj5";
-        license = "MIT";
-        authors = [
-          "Yevhenii Reizner <razrfalcon@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "fontconfig-parser";
-            packageId = "fontconfig-parser";
-            optional = true;
-            usesDefaultFeatures = false;
-            target = { target, features }: ((target."unix" or false) && (!(("macos" == target."os" or null) || ("android" == target."os" or null))));
-          }
-          {
-            name = "log";
-            packageId = "log";
-          }
-          {
-            name = "memmap2";
-            packageId = "memmap2";
-            optional = true;
-          }
-          {
-            name = "slotmap";
-            packageId = "slotmap";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "tinyvec";
-            packageId = "tinyvec";
-            features = [ "alloc" ];
-          }
-          {
-            name = "ttf-parser";
-            packageId = "ttf-parser";
-            usesDefaultFeatures = false;
-            features = [ "opentype-layout" "apple-layout" "variable-fonts" "glyph-names" "no-std-float" ];
-          }
-        ];
-        features = {
-          "default" = [ "std" "fs" "memmap" "fontconfig" ];
-          "fontconfig" = [ "fontconfig-parser" "fs" ];
-          "fontconfig-parser" = [ "dep:fontconfig-parser" ];
-          "fs" = [ "std" ];
-          "memmap" = [ "fs" "memmap2" ];
-          "memmap2" = [ "dep:memmap2" ];
-          "std" = [ "ttf-parser/std" ];
-        };
-        resolvedDefaultFeatures = [ "fontconfig" "fontconfig-parser" "fs" "memmap" "memmap2" "std" ];
       };
       "futures-channel" = rec {
         crateName = "futures-channel";
@@ -4345,69 +3904,6 @@ rec {
         ];
 
       };
-      "glimt-raw" = rec {
-        crateName = "glimt-raw";
-        version = "0.2.1";
-        edition = "2024";
-        crateBin = [
-          {
-            name = "glimt-raw";
-            path = "src/main.rs";
-            requiredFeatures = [ ];
-          }
-        ];
-        src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/glimt-raw; };
-        license = "MIT OR Apache-2.0";
-        dependencies = [
-          {
-            name = "anyhow";
-            packageId = "anyhow";
-          }
-          {
-            name = "clap";
-            packageId = "clap";
-            features = [ "derive" ];
-          }
-          {
-            name = "cosmic-text";
-            packageId = "cosmic-text";
-          }
-          {
-            name = "glimt-cal";
-            packageId = "glimt-cal";
-          }
-          {
-            name = "glimt-shell";
-            packageId = "glimt-shell";
-          }
-          {
-            name = "napkin-math";
-            packageId = "napkin-math";
-          }
-          {
-            name = "smithay-client-toolkit";
-            packageId = "smithay-client-toolkit";
-          }
-          {
-            name = "tiny-skia";
-            packageId = "tiny-skia";
-          }
-          {
-            name = "tracing";
-            packageId = "tracing";
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-          }
-          {
-            name = "wayland-protocols";
-            packageId = "wayland-protocols";
-            features = [ "client" ];
-          }
-        ];
-
-      };
       "glimt-shell" = rec {
         crateName = "glimt-shell";
         version = "0.2.1";
@@ -5025,43 +4521,6 @@ rec {
         };
         resolvedDefaultFeatures = [ "v4_10" "v4_12" "v4_2" "v4_4" "v4_6" "v4_8" ];
       };
-      "harfrust" = rec {
-        crateName = "harfrust";
-        version = "0.5.2";
-        edition = "2021";
-        sha256 = "1ya5d0j39lf15vk27vncz616cbbadm6rggvp95k9cvhzhapfb8lx";
-        license = "MIT";
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-            features = [ "extern_crate_alloc" ];
-          }
-          {
-            name = "core_maths";
-            packageId = "core_maths";
-          }
-          {
-            name = "read-fonts";
-            packageId = "read-fonts 0.37.0";
-            usesDefaultFeatures = false;
-            features = [ "libm" ];
-          }
-          {
-            name = "smallvec";
-            packageId = "smallvec";
-          }
-        ];
-        features = {
-          "default" = [ "std" ];
-          "std" = [ "read-fonts/std" ];
-        };
-        resolvedDefaultFeatures = [ "std" ];
-      };
       "hashbrown 0.15.5" = rec {
         crateName = "hashbrown";
         version = "0.15.5";
@@ -5544,18 +5003,6 @@ rec {
         };
         resolvedDefaultFeatures = [ "arch" "default" ];
       };
-      "linebender_resource_handle" = rec {
-        crateName = "linebender_resource_handle";
-        version = "0.1.1";
-        edition = "2021";
-        sha256 = "1x34mrmqan0m3m9xf2iy6vpkcx6vwiiyzm2g3ixqdi56rimzz9fl";
-        license = "Apache-2.0 OR MIT";
-        features = {
-          "default" = [ "std" ];
-          "serde" = [ "dep:serde" "dep:serde_bytes" ];
-        };
-        resolvedDefaultFeatures = [ "std" ];
-      };
       "linux-raw-sys" = rec {
         crateName = "linux-raw-sys";
         version = "0.12.1";
@@ -5938,28 +5385,6 @@ rec {
         };
         resolvedDefaultFeatures = [ "alloc" "default" "std" ];
       };
-      "memmap2" = rec {
-        crateName = "memmap2";
-        version = "0.9.11";
-        edition = "2021";
-        sha256 = "1h4qnzgarnn488ljjpg9ns5y4bw0sq0xv0fj0iqywagjnz8rw8fi";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "Dan Burkert <dan@danburkert.com>"
-          "Yevhenii Reizner <razrfalcon@gmail.com>"
-          "The Contributors"
-        ];
-        dependencies = [
-          {
-            name = "libc";
-            packageId = "libc";
-            target = { target, features }: (target."unix" or false);
-          }
-        ];
-        features = {
-          "stable_deref_trait" = [ "dep:stable_deref_trait" ];
-        };
-      };
       "memoffset" = rec {
         crateName = "memoffset";
         version = "0.9.1";
@@ -6035,42 +5460,7 @@ rec {
         };
         resolvedDefaultFeatures = [ "std" ];
       };
-      "miniz_oxide 0.8.9" = rec {
-        crateName = "miniz_oxide";
-        version = "0.8.9";
-        edition = "2021";
-        sha256 = "05k3pdg8bjjzayq3rf0qhpirq9k37pxnasfn4arbs17phqn6m9qz";
-        license = "MIT OR Zlib OR Apache-2.0";
-        authors = [
-          "Frommi <daniil.liferenko@gmail.com>"
-          "oyvindln <oyvindln@users.noreply.github.com>"
-          "Rich Geldreich richgel99@gmail.com"
-        ];
-        dependencies = [
-          {
-            name = "adler2";
-            packageId = "adler2";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "simd-adler32";
-            packageId = "simd-adler32";
-            optional = true;
-            usesDefaultFeatures = false;
-          }
-        ];
-        features = {
-          "alloc" = [ "dep:alloc" ];
-          "core" = [ "dep:core" ];
-          "default" = [ "with-alloc" ];
-          "rustc-dep-of-std" = [ "core" "alloc" "adler2/rustc-dep-of-std" ];
-          "serde" = [ "dep:serde" ];
-          "simd" = [ "simd-adler32" ];
-          "simd-adler32" = [ "dep:simd-adler32" ];
-        };
-        resolvedDefaultFeatures = [ "default" "simd" "simd-adler32" "with-alloc" ];
-      };
-      "miniz_oxide 0.9.1" = rec {
+      "miniz_oxide" = rec {
         crateName = "miniz_oxide";
         version = "0.9.1";
         edition = "2021";
@@ -6126,7 +5516,7 @@ rec {
           }
           {
             name = "roxmltree";
-            packageId = "roxmltree 0.21.1";
+            packageId = "roxmltree";
           }
           {
             name = "scheme-rs";
@@ -6823,43 +6213,6 @@ rec {
         ];
 
       };
-      "png" = rec {
-        crateName = "png";
-        version = "0.18.1";
-        edition = "2021";
-        sha256 = "0qca282xp8a6d7mikxrwji3f52mjn4vnqxz2v9iz5adj665rnxk0";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "The image-rs Developers"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "crc32fast";
-            packageId = "crc32fast";
-          }
-          {
-            name = "fdeflate";
-            packageId = "fdeflate";
-          }
-          {
-            name = "flate2";
-            packageId = "flate2";
-          }
-          {
-            name = "miniz_oxide";
-            packageId = "miniz_oxide 0.8.9";
-            features = [ "simd" ];
-          }
-        ];
-        features = {
-          "unstable" = [ "crc32fast/nightly" ];
-          "zlib-rs" = [ "flate2/zlib-rs" ];
-        };
-      };
       "polling" = rec {
         crateName = "polling";
         version = "3.11.0";
@@ -6992,32 +6345,6 @@ rec {
           }
         ];
 
-      };
-      "quick-xml" = rec {
-        crateName = "quick-xml";
-        version = "0.41.0";
-        edition = "2021";
-        sha256 = "1h9y8zry34r3mxfd5vqfj50vvvzvri4kzbx5d657jkqjalg4aq76";
-        libName = "quick_xml";
-        license = "MIT";
-        dependencies = [
-          {
-            name = "memchr";
-            packageId = "memchr";
-          }
-        ];
-        features = {
-          "arbitrary" = [ "dep:arbitrary" ];
-          "async-tokio" = [ "tokio" ];
-          "document-features" = [ "dep:document-features" ];
-          "encoding" = [ "encoding_rs" ];
-          "encoding_rs" = [ "dep:encoding_rs" ];
-          "serde" = [ "dep:serde" ];
-          "serde-types" = [ "serde/derive" ];
-          "serialize" = [ "serde" ];
-          "tokio" = [ "dep:tokio" ];
-        };
-        resolvedDefaultFeatures = [ "default" ];
       };
       "quote" = rec {
         crateName = "quote";
@@ -7183,87 +6510,6 @@ rec {
           "std" = [ "getrandom?/std" ];
         };
         resolvedDefaultFeatures = [ "os_rng" "std" ];
-      };
-      "rangemap" = rec {
-        crateName = "rangemap";
-        version = "1.8.0";
-        edition = "2018";
-        sha256 = "0gdaws5kkg3md7z4w7ln4sf3jkz6n3f3xl5pfr6fngvla1dx24d6";
-        license = "MIT/Apache-2.0";
-        authors = [
-          "Jeff Parsons <jeff@parsons.io>"
-        ];
-        features = {
-          "ordered-float5" = [ "dep:ordered-float" ];
-          "quickcheck" = [ "dep:quickcheck" ];
-          "serde" = [ "dep:serde" ];
-          "serde1" = [ "serde" "ordered-float?/serde" ];
-        };
-      };
-      "read-fonts 0.37.0" = rec {
-        crateName = "read-fonts";
-        version = "0.37.0";
-        edition = "2021";
-        sha256 = "1r82vwrmsai9i7bgmnblb7sn08k2kca75lpz0x9v3yijy2mlyqvv";
-        libName = "read_fonts";
-        license = "MIT OR Apache-2.0";
-        dependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-          }
-          {
-            name = "core_maths";
-            packageId = "core_maths";
-            optional = true;
-          }
-          {
-            name = "font-types";
-            packageId = "font-types 0.11.3";
-            features = [ "bytemuck" ];
-          }
-        ];
-        features = {
-          "default" = [ "std" ];
-          "experimental_traverse" = [ "std" ];
-          "libm" = [ "dep:core_maths" ];
-          "serde" = [ "dep:serde" "font-types/serde" ];
-          "std" = [ "font-types/std" ];
-        };
-        resolvedDefaultFeatures = [ "libm" "std" ];
-      };
-      "read-fonts 0.41.0" = rec {
-        crateName = "read-fonts";
-        version = "0.41.0";
-        edition = "2021";
-        sha256 = "02c7q458gz6cfsyryiss5w6xp0k8dl2n4l1gncjrhidg9mkpssh4";
-        libName = "read_fonts";
-        license = "MIT OR Apache-2.0";
-        dependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-          }
-          {
-            name = "font-types";
-            packageId = "font-types 0.12.7";
-            features = [ "bytemuck" ];
-          }
-          {
-            name = "once_cell";
-            packageId = "once_cell";
-            usesDefaultFeatures = false;
-            features = [ "alloc" "race" ];
-          }
-        ];
-        features = {
-          "default" = [ "std" ];
-          "experimental_traverse" = [ "std" ];
-          "libm" = [ "dep:core_maths" ];
-          "serde" = [ "dep:serde" "font-types/serde" ];
-          "std" = [ "font-types/std" ];
-        };
-        resolvedDefaultFeatures = [ "std" ];
       };
       "redox_syscall" = rec {
         crateName = "redox_syscall";
@@ -7514,21 +6760,7 @@ rec {
         };
         resolvedDefaultFeatures = [ "alloc" "default" "dev_urandom_fallback" ];
       };
-      "roxmltree 0.20.0" = rec {
-        crateName = "roxmltree";
-        version = "0.20.0";
-        edition = "2021";
-        sha256 = "15vw91ps91wkmmgy62khf9zb63bdinvm80957dascbsw7dwvc83c";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "Yevhenii Reizner <razrfalcon@gmail.com>"
-        ];
-        features = {
-          "default" = [ "std" "positions" ];
-        };
-        resolvedDefaultFeatures = [ "default" "positions" "std" ];
-      };
-      "roxmltree 0.21.1" = rec {
+      "roxmltree" = rec {
         crateName = "roxmltree";
         version = "0.21.1";
         edition = "2021";
@@ -7811,7 +7043,7 @@ rec {
           "thread" = [ "linux-raw-sys/prctl" ];
           "use-libc" = [ "libc_errno" "libc" ];
         };
-        resolvedDefaultFeatures = [ "alloc" "default" "event" "fs" "net" "pipe" "process" "shm" "std" "time" ];
+        resolvedDefaultFeatures = [ "alloc" "default" "event" "fs" "net" "pipe" "process" "std" "time" ];
       };
       "rustls" = rec {
         crateName = "rustls";
@@ -8299,20 +7531,6 @@ rec {
           "default" = [ "use_std" ];
         };
       };
-      "self_cell" = rec {
-        crateName = "self_cell";
-        version = "1.3.0";
-        edition = "2018";
-        sha256 = "04x883z7awzkmn5lqb67n51xynrj2pa9339jgq4j1qa94yh2rd1a";
-        license = "Apache-2.0 OR GPL-2.0-only";
-        authors = [
-          "Lukas Bergdoll <lukas.bergdoll@gmail.com>"
-        ];
-        features = {
-          "old_rust" = [ "rustversion" ];
-          "rustversion" = [ "dep:rustversion" ];
-        };
-      };
       "semver" = rec {
         crateName = "semver";
         version = "1.0.28";
@@ -8635,75 +7853,6 @@ rec {
         features = {
           "default" = [ "std" "const-generics" ];
         };
-        resolvedDefaultFeatures = [ "const-generics" "default" "std" ];
-      };
-      "skrifa 0.40.0" = rec {
-        crateName = "skrifa";
-        version = "0.40.0";
-        edition = "2021";
-        sha256 = "1b1lfid1326df2aq4cjqz7jv63m3i21czrgks7fxgyvm4hyzxgbz";
-        license = "MIT OR Apache-2.0";
-        dependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-          }
-          {
-            name = "read-fonts";
-            packageId = "read-fonts 0.37.0";
-            usesDefaultFeatures = false;
-          }
-        ];
-        devDependencies = [
-          {
-            name = "read-fonts";
-            packageId = "read-fonts 0.37.0";
-            usesDefaultFeatures = false;
-            features = [ "scaler_test" "serde" ];
-          }
-        ];
-        features = {
-          "default" = [ "std" "autohint_shaping" ];
-          "libm" = [ "dep:core_maths" "read-fonts/libm" ];
-          "spec_next" = [ "read-fonts/spec_next" ];
-          "std" = [ "read-fonts/std" ];
-          "traversal" = [ "std" "read-fonts/experimental_traverse" ];
-        };
-        resolvedDefaultFeatures = [ "std" ];
-      };
-      "skrifa 0.44.0" = rec {
-        crateName = "skrifa";
-        version = "0.44.0";
-        edition = "2021";
-        sha256 = "0s5a3fnyrxfv514vjjrn268lyhihmh5nb9fyv7cp4ghx5gbbg6l1";
-        license = "MIT OR Apache-2.0";
-        dependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-          }
-          {
-            name = "read-fonts";
-            packageId = "read-fonts 0.41.0";
-            usesDefaultFeatures = false;
-          }
-        ];
-        devDependencies = [
-          {
-            name = "read-fonts";
-            packageId = "read-fonts 0.41.0";
-            usesDefaultFeatures = false;
-            features = [ "scaler_test" "serde" ];
-          }
-        ];
-        features = {
-          "default" = [ "std" "autohint_shaping" ];
-          "libm" = [ "dep:core_maths" "read-fonts/libm" ];
-          "spec_next" = [ "read-fonts/spec_next" ];
-          "std" = [ "read-fonts/std" ];
-          "traversal" = [ "std" "read-fonts/experimental_traverse" ];
-        };
-        resolvedDefaultFeatures = [ "std" ];
       };
       "slab" = rec {
         crateName = "slab";
@@ -8719,26 +7868,6 @@ rec {
           "serde" = [ "dep:serde" ];
         };
         resolvedDefaultFeatures = [ "default" "std" ];
-      };
-      "slotmap" = rec {
-        crateName = "slotmap";
-        version = "1.1.1";
-        edition = "2018";
-        sha256 = "0f20xf53zaysx9ydzkwwqm6hsjyb8lj2j6amhg57iln3jcy8rmdx";
-        license = "Zlib";
-        authors = [
-          "Orson Peters <orsonpeters@gmail.com>"
-        ];
-        buildDependencies = [
-          {
-            name = "version_check";
-            packageId = "version_check";
-          }
-        ];
-        features = {
-          "default" = [ "std" ];
-          "serde" = [ "dep:serde" ];
-        };
       };
       "smallvec" = rec {
         crateName = "smallvec";
@@ -8760,148 +7889,6 @@ rec {
           "unty" = [ "dep:unty" ];
         };
         resolvedDefaultFeatures = [ "const_generics" "const_new" "union" ];
-      };
-      "smithay-client-toolkit" = rec {
-        crateName = "smithay-client-toolkit";
-        version = "0.21.1";
-        edition = "2021";
-        sha256 = "003zc6547msmwh729lkpm6acjw60rax42qamz4svbp0g9ghrxp3l";
-        libName = "smithay_client_toolkit";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-          "i509VCB <mail@i509.me>"
-          "Ashley Wulber <ashley@system76.com>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-            optional = true;
-          }
-          {
-            name = "calloop";
-            packageId = "calloop";
-            optional = true;
-          }
-          {
-            name = "calloop-wayland-source";
-            packageId = "calloop-wayland-source";
-            optional = true;
-          }
-          {
-            name = "cursor-icon";
-            packageId = "cursor-icon";
-          }
-          {
-            name = "log";
-            packageId = "log";
-          }
-          {
-            name = "memmap2";
-            packageId = "memmap2";
-          }
-          {
-            name = "rustix";
-            packageId = "rustix";
-            features = [ "fs" "pipe" "shm" ];
-          }
-          {
-            name = "thiserror";
-            packageId = "thiserror";
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-          }
-          {
-            name = "wayland-csd-frame";
-            packageId = "wayland-csd-frame";
-          }
-          {
-            name = "wayland-cursor";
-            packageId = "wayland-cursor";
-          }
-          {
-            name = "wayland-protocols";
-            packageId = "wayland-protocols";
-            features = [ "client" "staging" "unstable" ];
-          }
-          {
-            name = "wayland-protocols-experimental";
-            packageId = "wayland-protocols-experimental";
-            features = [ "client" ];
-          }
-          {
-            name = "wayland-protocols-misc";
-            packageId = "wayland-protocols-misc";
-            features = [ "client" ];
-          }
-          {
-            name = "wayland-protocols-wlr";
-            packageId = "wayland-protocols-wlr";
-            features = [ "client" ];
-          }
-          {
-            name = "wayland-scanner";
-            packageId = "wayland-scanner";
-          }
-          {
-            name = "xkbcommon";
-            packageId = "xkbcommon";
-            optional = true;
-            features = [ "wayland" ];
-          }
-          {
-            name = "xkeysym";
-            packageId = "xkeysym";
-          }
-        ];
-        buildDependencies = [
-          {
-            name = "pkg-config";
-            packageId = "pkg-config";
-            optional = true;
-          }
-        ];
-        devDependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-          }
-        ];
-        features = {
-          "bytemuck" = [ "dep:bytemuck" ];
-          "calloop" = [ "dep:calloop" "calloop-wayland-source" ];
-          "calloop-wayland-source" = [ "dep:calloop-wayland-source" ];
-          "default" = [ "calloop" "xkbcommon" ];
-          "pkg-config" = [ "dep:pkg-config" ];
-          "system" = [ "wayland-client/system" ];
-          "xkbcommon" = [ "dep:xkbcommon" "bytemuck" "pkg-config" "xkeysym/bytemuck" ];
-        };
-        resolvedDefaultFeatures = [ "bytemuck" "calloop" "calloop-wayland-source" "default" "pkg-config" "xkbcommon" ];
-      };
-      "smol_str" = rec {
-        crateName = "smol_str";
-        version = "0.3.6";
-        edition = "2024";
-        sha256 = "08qm7y1k2fkzrs8k78m03h4z4wbarv5g0bfr5m62m1glzil77aja";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "Aleksey Kladov <aleksey.kladov@gmail.com>"
-          "Lukas Wirth <lukastw97@gmail.com>"
-        ];
-        features = {
-          "arbitrary" = [ "dep:arbitrary" ];
-          "borsh" = [ "dep:borsh" ];
-          "default" = [ "std" ];
-          "serde" = [ "dep:serde_core" ];
-          "std" = [ "serde_core?/std" "borsh?/std" ];
-        };
       };
       "stable_deref_trait" = rec {
         crateName = "stable_deref_trait";
@@ -9008,22 +7995,6 @@ rec {
         ];
 
       };
-      "strict-num" = rec {
-        crateName = "strict-num";
-        version = "0.1.1";
-        edition = "2018";
-        sha256 = "0cb7l1vhb8zj90mzm8avlk815k40sql9515s865rqdrdfavvldv6";
-        libName = "strict_num";
-        license = "MIT";
-        authors = [
-          "Yevhenii Reizner <razrfalcon@gmail.com>"
-        ];
-        features = {
-          "approx-eq" = [ "float-cmp" ];
-          "default" = [ "approx-eq" ];
-          "float-cmp" = [ "dep:float-cmp" ];
-        };
-      };
       "strsim" = rec {
         crateName = "strsim";
         version = "0.11.1";
@@ -9049,43 +8020,6 @@ rec {
         features = {
           "default" = [ "std" "i128" ];
         };
-      };
-      "swash" = rec {
-        crateName = "swash";
-        version = "0.2.10";
-        edition = "2021";
-        sha256 = "0bprhdib5yjpzvfb0nkqplwpm47di9qnh8ibhy416lr6v319j93c";
-        license = "Apache-2.0 OR MIT";
-        authors = [
-          "Chad Brokaw <cbrokaw@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "skrifa";
-            packageId = "skrifa 0.44.0";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "yazi";
-            packageId = "yazi";
-            optional = true;
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "zeno";
-            packageId = "zeno";
-            optional = true;
-            usesDefaultFeatures = false;
-          }
-        ];
-        features = {
-          "default" = [ "std" "scale" "render" ];
-          "libm" = [ "dep:core_maths" "skrifa/libm" "zeno?/libm" ];
-          "render" = [ "scale" "zeno/eval" ];
-          "scale" = [ "dep:yazi" "dep:zeno" ];
-          "std" = [ "skrifa/std" "zeno?/std" "yazi?/std" ];
-        };
-        resolvedDefaultFeatures = [ "render" "scale" "std" ];
       };
       "syn 2.0.119" = rec {
         crateName = "syn";
@@ -9154,30 +8088,6 @@ rec {
           "test" = [ "syn-test-suite/all-features" ];
         };
         resolvedDefaultFeatures = [ "clone-impls" "default" "derive" "extra-traits" "fold" "full" "parsing" "printing" "proc-macro" "visit" "visit-mut" ];
-      };
-      "sys-locale" = rec {
-        crateName = "sys-locale";
-        version = "0.3.2";
-        edition = "2018";
-        sha256 = "1i16hq9mkwpzqvixjfy1ph4i2q5klgagjg4hibz6k894l2crmawf";
-        libName = "sys_locale";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "1Password"
-        ];
-        dependencies = [
-          {
-            name = "libc";
-            packageId = "libc";
-            target = { target, features }: ("android" == target."os" or null);
-          }
-        ];
-        features = {
-          "js" = [ "js-sys" "wasm-bindgen" "web-sys" ];
-          "js-sys" = [ "dep:js-sys" ];
-          "wasm-bindgen" = [ "dep:wasm-bindgen" ];
-          "web-sys" = [ "dep:web-sys" ];
-        };
       };
       "system-deps 8.0.0" = rec {
         crateName = "system-deps";
@@ -9338,53 +8248,6 @@ rec {
         };
         resolvedDefaultFeatures = [ "default" "getrandom" ];
       };
-      "thiserror" = rec {
-        crateName = "thiserror";
-        version = "2.0.21";
-        edition = "2021";
-        sha256 = "17hq1lh5dyr3bkc7zzjrbrp4qgkvhc48kgq1n5fdxkindaw2rr89";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "David Tolnay <dtolnay@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "thiserror-impl";
-            packageId = "thiserror-impl";
-          }
-        ];
-        features = {
-          "default" = [ "std" ];
-        };
-        resolvedDefaultFeatures = [ "default" "std" ];
-      };
-      "thiserror-impl" = rec {
-        crateName = "thiserror-impl";
-        version = "2.0.21";
-        edition = "2021";
-        sha256 = "0945n8agp7kg6n6b35yyjb4g5xv2q22vrw15h6jj1nw76a99flgy";
-        procMacro = true;
-        libName = "thiserror_impl";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "David Tolnay <dtolnay@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "proc-macro2";
-            packageId = "proc-macro2";
-          }
-          {
-            name = "quote";
-            packageId = "quote";
-          }
-          {
-            name = "syn";
-            packageId = "syn 3.0.9";
-          }
-        ];
-
-      };
       "thread_local" = rec {
         crateName = "thread_local";
         version = "1.1.10";
@@ -9402,114 +8265,6 @@ rec {
         ];
         features = {
         };
-      };
-      "tiny-skia" = rec {
-        crateName = "tiny-skia";
-        version = "0.12.0";
-        edition = "2021";
-        sha256 = "1sliba6ghl038ig7r4wds7aq9v5x1swmdqxh1xipylpmm9gfxzs7";
-        libName = "tiny_skia";
-        license = "BSD-3-Clause";
-        authors = [
-          "Yevhenii Reizner <razrfalcon@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "arrayref";
-            packageId = "arrayref";
-          }
-          {
-            name = "arrayvec";
-            packageId = "arrayvec";
-            usesDefaultFeatures = false;
-          }
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-            features = [ "aarch64_simd" ];
-          }
-          {
-            name = "cfg-if";
-            packageId = "cfg-if";
-          }
-          {
-            name = "log";
-            packageId = "log";
-          }
-          {
-            name = "png";
-            packageId = "png";
-            optional = true;
-          }
-          {
-            name = "tiny-skia-path";
-            packageId = "tiny-skia-path";
-            usesDefaultFeatures = false;
-          }
-        ];
-        features = {
-          "default" = [ "std" "simd" "png-format" ];
-          "no-std-float" = [ "tiny-skia-path/no-std-float" ];
-          "png-format" = [ "std" "dep:png" ];
-          "std" = [ "tiny-skia-path/std" ];
-        };
-        resolvedDefaultFeatures = [ "default" "png-format" "simd" "std" ];
-      };
-      "tiny-skia-path" = rec {
-        crateName = "tiny-skia-path";
-        version = "0.12.0";
-        edition = "2021";
-        sha256 = "1fgfzl0mzf2vfcqk3817wxynhmvcza05jg2r0rysdk5c7xf3djpd";
-        libName = "tiny_skia_path";
-        license = "BSD-3-Clause";
-        authors = [
-          "Yevhenii Reizner <razrfalcon@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "arrayref";
-            packageId = "arrayref";
-          }
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-          }
-          {
-            name = "strict-num";
-            packageId = "strict-num";
-            usesDefaultFeatures = false;
-          }
-        ];
-        features = {
-          "default" = [ "std" ];
-          "libm" = [ "dep:libm" ];
-          "no-std-float" = [ "libm" ];
-        };
-        resolvedDefaultFeatures = [ "std" ];
-      };
-      "tinyvec" = rec {
-        crateName = "tinyvec";
-        version = "1.13.3";
-        edition = "2018";
-        sha256 = "1vphg4gnlpykjy5h4v7r8nl38ij4zr9qyh7qd34ddvwjyqaa6g7x";
-        license = "Zlib OR Apache-2.0 OR MIT";
-        authors = [
-          "Lokathor <zefria@gmail.com>"
-        ];
-        features = {
-          "arbitrary" = [ "dep:arbitrary" ];
-          "bin-proto" = [ "dep:bin-proto" ];
-          "borsh" = [ "dep:borsh" ];
-          "defmt" = [ "dep:defmt" ];
-          "generic-array" = [ "dep:generic-array" ];
-          "latest_stable_rust" = [ "rustc_1_61" ];
-          "real_blackbox" = [ "criterion/real_blackbox" ];
-          "rustc_1_61" = [ "rustc_1_57" ];
-          "schemars" = [ "dep:schemars" "alloc" ];
-          "serde" = [ "dep:serde_core" ];
-          "std" = [ "alloc" ];
-        };
-        resolvedDefaultFeatures = [ "alloc" "default" ];
       };
       "toml" = rec {
         crateName = "toml";
@@ -9679,11 +8434,6 @@ rec {
         ];
         dependencies = [
           {
-            name = "log";
-            packageId = "log";
-            optional = true;
-          }
-          {
             name = "pin-project-lite";
             packageId = "pin-project-lite";
           }
@@ -9698,12 +8448,6 @@ rec {
             usesDefaultFeatures = false;
           }
         ];
-        devDependencies = [
-          {
-            name = "log";
-            packageId = "log";
-          }
-        ];
         features = {
           "attributes" = [ "tracing-attributes" ];
           "default" = [ "std" "attributes" ];
@@ -9713,7 +8457,7 @@ rec {
           "tracing-attributes" = [ "dep:tracing-attributes" ];
           "valuable" = [ "tracing-core/valuable" ];
         };
-        resolvedDefaultFeatures = [ "attributes" "default" "log" "std" "tracing-attributes" ];
+        resolvedDefaultFeatures = [ "attributes" "default" "std" "tracing-attributes" ];
       };
       "tracing-attributes" = rec {
         crateName = "tracing-attributes";
@@ -9920,34 +8664,6 @@ rec {
         };
         resolvedDefaultFeatures = [ "alloc" "ansi" "default" "env-filter" "fmt" "matchers" "nu-ansi-term" "once_cell" "registry" "sharded-slab" "smallvec" "std" "thread_local" "tracing" "tracing-log" ];
       };
-      "ttf-parser" = rec {
-        crateName = "ttf-parser";
-        version = "0.25.1";
-        edition = "2018";
-        sha256 = "0cbgqglcwwjg3hirwq6xlza54w04mb5x02kf7zx4hrw50xmr1pyj";
-        libName = "ttf_parser";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "Caleb Maclennan <caleb@alerque.com>"
-          "Laurenz Stampfl <laurenz.stampfl@gmail.com>"
-          "Yevhenii Reizner <razrfalcon@gmail.com>"
-          "خالد حسني (Khaled Hosny) <khaled@aliftype.com>"
-        ];
-        dependencies = [
-          {
-            name = "core_maths";
-            packageId = "core_maths";
-            optional = true;
-          }
-        ];
-        features = {
-          "core_maths" = [ "dep:core_maths" ];
-          "default" = [ "std" "opentype-layout" "apple-layout" "variable-fonts" "glyph-names" ];
-          "gvar-alloc" = [ "std" ];
-          "no-std-float" = [ "core_maths" ];
-        };
-        resolvedDefaultFeatures = [ "apple-layout" "core_maths" "glyph-names" "no-std-float" "opentype-layout" "std" "variable-fonts" ];
-      };
       "typenum" = rec {
         crateName = "typenum";
         version = "1.20.1";
@@ -10001,27 +8717,6 @@ rec {
         features = {
         };
       };
-      "unicode-bidi" = rec {
-        crateName = "unicode-bidi";
-        version = "0.3.18";
-        edition = "2018";
-        sha256 = "1xcxwbsqa24b8vfchhzyyzgj0l6bn51ib5v8j6krha0m77dva72w";
-        libName = "unicode_bidi";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "The Servo Project Developers"
-        ];
-        features = {
-          "default" = [ "std" "hardcoded-data" ];
-          "flame" = [ "dep:flame" ];
-          "flame_it" = [ "flame" "flamer" ];
-          "flamer" = [ "dep:flamer" ];
-          "serde" = [ "dep:serde" ];
-          "smallvec" = [ "dep:smallvec" ];
-          "with_serde" = [ "serde" ];
-        };
-        resolvedDefaultFeatures = [ "hardcoded-data" "std" ];
-      };
       "unicode-ident" = rec {
         crateName = "unicode-ident";
         version = "1.0.27";
@@ -10033,34 +8728,6 @@ rec {
           "David Tolnay <dtolnay@gmail.com>"
         ];
 
-      };
-      "unicode-linebreak" = rec {
-        crateName = "unicode-linebreak";
-        version = "0.1.5";
-        edition = "2021";
-        sha256 = "07spj2hh3daajg335m4wdav6nfkl0f6c0q72lc37blr97hych29v";
-        libName = "unicode_linebreak";
-        license = "Apache-2.0";
-        authors = [
-          "Axel Forsman <axelsfor@gmail.com>"
-        ];
-
-      };
-      "unicode-script" = rec {
-        crateName = "unicode-script";
-        version = "0.5.8";
-        edition = "2018";
-        sha256 = "1vmifpgd0map3frmvhszhl96k82crcry083prv05wii7p45x8fiq";
-        libName = "unicode_script";
-        license = "MIT OR Apache-2.0";
-        authors = [
-          "Manish Goregaokar <manishsmail@gmail.com>"
-        ];
-        features = {
-          "core" = [ "dep:core" ];
-          "rustc-dep-of-std" = [ "std" "core" ];
-          "std" = [ "dep:std" ];
-        };
       };
       "unicode-segmentation" = rec {
         crateName = "unicode-segmentation";
@@ -10371,17 +9038,6 @@ rec {
         ];
 
       };
-      "version_check" = rec {
-        crateName = "version_check";
-        version = "0.9.5";
-        edition = "2015";
-        sha256 = "0nhhi4i5x89gm911azqbn7avs9mdacw2i3vcz3cnmz3mv4rqz4hb";
-        license = "MIT/Apache-2.0";
-        authors = [
-          "Sergio Benitez <sb@sergio.bz>"
-        ];
-
-      };
       "walkdir" = rec {
         crateName = "walkdir";
         version = "2.5.0";
@@ -10620,361 +9276,6 @@ rec {
           }
         ];
         features = {
-        };
-      };
-      "wayland-backend" = rec {
-        crateName = "wayland-backend";
-        version = "0.3.17";
-        edition = "2021";
-        sha256 = "0y50cw56f09cdcsinbbl94naz91xf7iqaj87s4f7py6zmm71pa9q";
-        libName = "wayland_backend";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "downcast-rs";
-            packageId = "downcast-rs";
-          }
-          {
-            name = "rustix";
-            packageId = "rustix";
-            features = [ "event" "fs" "net" "process" ];
-          }
-          {
-            name = "smallvec";
-            packageId = "smallvec";
-            features = [ "union" "const_generics" "const_new" ];
-          }
-          {
-            name = "wayland-sys";
-            packageId = "wayland-sys";
-          }
-        ];
-        buildDependencies = [
-          {
-            name = "cc";
-            packageId = "cc";
-          }
-        ];
-        features = {
-          "client_system" = [ "wayland-sys/client" "dep:scoped-tls" ];
-          "dlopen" = [ "wayland-sys/dlopen" ];
-          "libwayland_client_1_23" = [ "wayland-sys/libwayland_client_1_23" ];
-          "libwayland_server_1_22" = [ "wayland-sys/libwayland_server_1_22" ];
-          "libwayland_server_1_23" = [ "wayland-sys/libwayland_server_1_23" "libwayland_server_1_22" ];
-          "log" = [ "dep:log" ];
-          "raw-window-handle" = [ "dep:raw-window-handle" ];
-          "rwh_06" = [ "dep:rwh_06" ];
-          "server_system" = [ "wayland-sys/server" "dep:scoped-tls" ];
-        };
-      };
-      "wayland-client" = rec {
-        crateName = "wayland-client";
-        version = "0.31.15";
-        edition = "2021";
-        sha256 = "0ww0d0r6rn2h0sn8ma1f7zvxj40l6930p07j044nvmqshq7nmhz3";
-        libName = "wayland_client";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "rustix";
-            packageId = "rustix";
-            features = [ "event" ];
-          }
-          {
-            name = "wayland-backend";
-            packageId = "wayland-backend";
-          }
-          {
-            name = "wayland-scanner";
-            packageId = "wayland-scanner";
-          }
-        ];
-        features = {
-          "dlopen" = [ "wayland-backend/dlopen" ];
-          "libwayland_1_23" = [ "wayland-backend/libwayland_client_1_23" ];
-          "log" = [ "dep:log" ];
-          "system" = [ "wayland-backend/client_system" ];
-        };
-      };
-      "wayland-csd-frame" = rec {
-        crateName = "wayland-csd-frame";
-        version = "0.3.0";
-        edition = "2021";
-        sha256 = "0zjcmcqprfzx57hlm741n89ssp4sha5yh5cnmbk2agflvclm0p32";
-        libName = "wayland_csd_frame";
-        license = "MIT";
-        authors = [
-          "Kirill Chibisov <contact@kchibisov.com>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "cursor-icon";
-            packageId = "cursor-icon";
-          }
-          {
-            name = "wayland-backend";
-            packageId = "wayland-backend";
-            usesDefaultFeatures = false;
-          }
-        ];
-
-      };
-      "wayland-cursor" = rec {
-        crateName = "wayland-cursor";
-        version = "0.31.14";
-        edition = "2021";
-        sha256 = "0kdk7xwj465idk54jf1f24024gdp63wyagca68a176xyh23x2lja";
-        libName = "wayland_cursor";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "rustix";
-            packageId = "rustix";
-            features = [ "shm" ];
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-          }
-          {
-            name = "xcursor";
-            packageId = "xcursor";
-          }
-        ];
-
-      };
-      "wayland-protocols" = rec {
-        crateName = "wayland-protocols";
-        version = "0.32.13";
-        edition = "2024";
-        sha256 = "1dn4injzx1lnmacnhl3q60m743lvshxmmy0aabb2xaixvq9wil13";
-        libName = "wayland_protocols";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "wayland-backend";
-            packageId = "wayland-backend";
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-            optional = true;
-          }
-          {
-            name = "wayland-scanner";
-            packageId = "wayland-scanner";
-          }
-        ];
-        features = {
-          "client" = [ "wayland-client" ];
-          "server" = [ "wayland-server" ];
-          "wayland-client" = [ "dep:wayland-client" ];
-          "wayland-server" = [ "dep:wayland-server" ];
-        };
-        resolvedDefaultFeatures = [ "client" "staging" "unstable" "wayland-client" ];
-      };
-      "wayland-protocols-experimental" = rec {
-        crateName = "wayland-protocols-experimental";
-        version = "20251230.0.3";
-        edition = "2021";
-        sha256 = "04yg4ny7pkla5iqdswfxvslzxakrphr916a67l4ksmcf2zkw7ili";
-        libName = "wayland_protocols_experimental";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "wayland-backend";
-            packageId = "wayland-backend";
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-            optional = true;
-          }
-          {
-            name = "wayland-protocols";
-            packageId = "wayland-protocols";
-            features = [ "unstable" ];
-          }
-          {
-            name = "wayland-scanner";
-            packageId = "wayland-scanner";
-          }
-        ];
-        features = {
-          "client" = [ "wayland-client" "wayland-protocols/client" ];
-          "server" = [ "wayland-server" "wayland-protocols/server" ];
-          "wayland-client" = [ "dep:wayland-client" ];
-          "wayland-server" = [ "dep:wayland-server" ];
-        };
-        resolvedDefaultFeatures = [ "client" "wayland-client" ];
-      };
-      "wayland-protocols-misc" = rec {
-        crateName = "wayland-protocols-misc";
-        version = "0.3.12";
-        edition = "2021";
-        sha256 = "1j19dg8h98s153rj2fvbqkghjicdfgjjkr6nvaw0jgpjkrcng5bf";
-        libName = "wayland_protocols_misc";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "wayland-backend";
-            packageId = "wayland-backend";
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-            optional = true;
-          }
-          {
-            name = "wayland-protocols";
-            packageId = "wayland-protocols";
-            features = [ "unstable" ];
-          }
-          {
-            name = "wayland-scanner";
-            packageId = "wayland-scanner";
-          }
-        ];
-        features = {
-          "client" = [ "wayland-client" "wayland-protocols/client" ];
-          "server" = [ "wayland-server" "wayland-protocols/server" ];
-          "wayland-client" = [ "dep:wayland-client" ];
-          "wayland-server" = [ "dep:wayland-server" ];
-        };
-        resolvedDefaultFeatures = [ "client" "wayland-client" ];
-      };
-      "wayland-protocols-wlr" = rec {
-        crateName = "wayland-protocols-wlr";
-        version = "0.3.12";
-        edition = "2021";
-        sha256 = "0d424vn2hj27r4gjlshm6hy8fcqysr805jkqdjbwgmrng0pya17b";
-        libName = "wayland_protocols_wlr";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "bitflags";
-            packageId = "bitflags 2.13.2";
-          }
-          {
-            name = "wayland-backend";
-            packageId = "wayland-backend";
-          }
-          {
-            name = "wayland-client";
-            packageId = "wayland-client";
-            optional = true;
-          }
-          {
-            name = "wayland-protocols";
-            packageId = "wayland-protocols";
-          }
-          {
-            name = "wayland-scanner";
-            packageId = "wayland-scanner";
-          }
-        ];
-        features = {
-          "client" = [ "wayland-client" "wayland-protocols/client" ];
-          "server" = [ "wayland-server" "wayland-protocols/server" ];
-          "wayland-client" = [ "dep:wayland-client" ];
-          "wayland-server" = [ "dep:wayland-server" ];
-        };
-        resolvedDefaultFeatures = [ "client" "wayland-client" ];
-      };
-      "wayland-scanner" = rec {
-        crateName = "wayland-scanner";
-        version = "0.31.11";
-        edition = "2021";
-        sha256 = "1h0al3271l2w124sxlh77s1kmjg0z24ns2mk1vbnfars3d3313ik";
-        procMacro = true;
-        libName = "wayland_scanner";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        dependencies = [
-          {
-            name = "proc-macro2";
-            packageId = "proc-macro2";
-          }
-          {
-            name = "quick-xml";
-            packageId = "quick-xml";
-          }
-          {
-            name = "quote";
-            packageId = "quote";
-          }
-        ];
-
-      };
-      "wayland-sys" = rec {
-        crateName = "wayland-sys";
-        version = "0.31.11";
-        edition = "2021";
-        sha256 = "1gp3hlkxx13i55lyyi794vnw9a780z3skx0xhj71zr69xwzv5snq";
-        libName = "wayland_sys";
-        license = "MIT";
-        authors = [
-          "Elinor Berger <elinor@safaradeg.net>"
-        ];
-        buildDependencies = [
-          {
-            name = "pkg-config";
-            packageId = "pkg-config";
-          }
-        ];
-        features = {
-          "client" = [ "dep:dlib" "dep:log" ];
-          "cursor" = [ "client" ];
-          "dlopen" = [ "once_cell" ];
-          "egl" = [ "client" ];
-          "libc" = [ "dep:libc" ];
-          "libwayland_server_1_23" = [ "libwayland_server_1_22" ];
-          "memoffset" = [ "dep:memoffset" ];
-          "once_cell" = [ "dep:once_cell" ];
-          "server" = [ "libc" "memoffset" "dep:dlib" "dep:log" ];
         };
       };
       "webpki-roots" = rec {
@@ -12538,80 +10839,6 @@ rec {
           "rustc-dep-of-std" = [ "dep:core" "dep:alloc" ];
         };
       };
-      "xcursor" = rec {
-        crateName = "xcursor";
-        version = "0.3.11";
-        edition = "2018";
-        sha256 = "08wfv0wrij9rrmbgfd2l8a132gyfax05abypllpmwic6hznk6fqn";
-        license = "MIT";
-        authors = [
-          "Samuele Esposito"
-        ];
-
-      };
-      "xkbcommon" = rec {
-        crateName = "xkbcommon";
-        version = "0.8.0";
-        edition = "2021";
-        sha256 = "1j8s1sfwc6bw9phsca65rw3q3b5l2651v1s0pk5yxm6baa9wlrld";
-        license = "MIT";
-        authors = [
-          "Remi THEBAULT <remi.thebault@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "libc";
-            packageId = "libc";
-          }
-          {
-            name = "memmap2";
-            packageId = "memmap2";
-            optional = true;
-          }
-          {
-            name = "xkeysym";
-            packageId = "xkeysym";
-          }
-        ];
-        features = {
-          "as-raw-xcb-connection" = [ "dep:as-raw-xcb-connection" ];
-          "default" = [ "wayland" ];
-          "memmap2" = [ "dep:memmap2" ];
-          "wayland" = [ "memmap2" ];
-          "x11" = [ "as-raw-xcb-connection" ];
-        };
-        resolvedDefaultFeatures = [ "default" "memmap2" "wayland" ];
-      };
-      "xkeysym" = rec {
-        crateName = "xkeysym";
-        version = "0.2.1";
-        edition = "2018";
-        sha256 = "0mksx670cszyd7jln6s7dhkw11hdfv7blwwr3isq98k22ljh1k5r";
-        license = "MIT OR Apache-2.0 OR Zlib";
-        authors = [
-          "John Nunley <jtnunley01@gmail.com>"
-        ];
-        dependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-            optional = true;
-            usesDefaultFeatures = false;
-            features = [ "derive" ];
-          }
-        ];
-        devDependencies = [
-          {
-            name = "bytemuck";
-            packageId = "bytemuck";
-          }
-        ];
-        features = {
-          "bytemuck" = [ "dep:bytemuck" ];
-          "serde" = [ "dep:serde" ];
-        };
-        resolvedDefaultFeatures = [ "bytemuck" ];
-      };
       "xml-rs" = rec {
         crateName = "xml-rs";
         version = "0.8.29";
@@ -12624,20 +10851,6 @@ rec {
           "Vladimir Matveev <vmatveev@citrine.cc>"
         ];
 
-      };
-      "yazi" = rec {
-        crateName = "yazi";
-        version = "0.2.1";
-        edition = "2021";
-        sha256 = "1dgv0dd0329dcbs57z2wj03daz8y1axgprw3pf5yf5jsbcjkh5z0";
-        license = "Apache-2.0 OR MIT";
-        authors = [
-          "Chad Brokaw <cbrokaw@gmail.com>"
-        ];
-        features = {
-          "default" = [ "std" ];
-        };
-        resolvedDefaultFeatures = [ "std" ];
       };
       "zbus" = rec {
         crateName = "zbus";
@@ -12905,21 +11118,6 @@ rec {
           "serde" = [ "dep:serde" ];
         };
         resolvedDefaultFeatures = [ "default" "serde" ];
-      };
-      "zeno" = rec {
-        crateName = "zeno";
-        version = "0.3.3";
-        edition = "2021";
-        sha256 = "0915lg3b1qiixizic9kwj2bw42x35baxqvl9dn0m2plkj91drwvd";
-        license = "Apache-2.0 OR MIT";
-        authors = [
-          "Chad Brokaw <cbrokaw@gmail.com>"
-        ];
-        features = {
-          "default" = [ "eval" "std" ];
-          "libm" = [ "dep:libm" ];
-        };
-        resolvedDefaultFeatures = [ "eval" "std" ];
       };
       "zerocopy" = rec {
         crateName = "zerocopy";

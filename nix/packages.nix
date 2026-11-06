@@ -19,7 +19,6 @@
 
       binaries = [
         "glimt"
-        "glimt-raw"
         "glimtctl"
         "glimt-bench"
       ];
@@ -31,9 +30,9 @@
       checks = lib.mapAttrs (_: lib.mkForce) built;
     };
 
-  # The base's overlay builds every binary member with plain cargo, which links neither
-  # GTK nor Wayland, so the two frontends need one of their own. It is a second overlay
-  # rather than a replacement because `flake.overlays.default` is the base's to define.
+  # The base's overlay builds every binary member with plain cargo, which does not link
+  # GTK, so the dashboard needs one of its own. It is a second overlay rather than a
+  # replacement because `flake.overlays.default` is the base's to define.
   flake.overlays.frontends =
     final: _prev:
     let
@@ -41,6 +40,5 @@
     in
     {
       glimt = cargoNix.workspaceMembers.glimt.build;
-      glimt-raw = cargoNix.workspaceMembers.glimt-raw.build;
     };
 }

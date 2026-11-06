@@ -33,18 +33,11 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 ureq = "3"
 zbus = "5"
 
-# Candidate A
+# The GTK frontend
 gdk4 = "0.11"
 glib = "0.22"
 gtk4 = "0.11"
 gtk4-layer-shell = "0.8"
-
-# Candidate B
-cosmic-text = "0.19"
-smithay-client-toolkit = "0.21"
-tiny-skia = "0.12"
-wayland-client = "0.31"
-wayland-protocols = "0.32"
 
 [workspace.lints.rust]
 unused_must_use = "deny"

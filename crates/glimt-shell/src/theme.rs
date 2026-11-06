@@ -1,14 +1,11 @@
-//! Colours, sizes and font sizes, shared so the two spikes draw the same picture.
+//! Colours, sizes and font sizes, shared with the drawing.
 //!
-//! The comparison is only worth something if what differs between the candidates is the
-//! toolkit. Layout is left to each of them, because how a toolkit expresses layout is
-//! one of the things being compared, but the numbers it lays out from are fixed here. A
-//! difference in the drawn result is then a difference in the renderer.
+//! Layout stays with the toolkit, because that is what the widget tree is for, but the
+//! numbers it lays out from are fixed here.
 //!
 //! Colours come in two palettes rather than as constants: the session's own light or
-//! dark preference picks one, and both candidates paint from the same one. Every role
-//! that used to be a single constant is a field, so a colour added later cannot be
-//! added to one palette and forgotten in the other.
+//! dark preference picks one. Every role that used to be a single constant is a field,
+//! so a colour added later cannot be added to one palette and forgotten in the other.
 //!
 //! Lengths are logical pixels, before the output's scale is applied. The window is
 //! maximized, so its width and height come from the compositor and the layout is
@@ -16,7 +13,7 @@
 
 use crate::appearance::Scheme;
 
-/// Straight 8-bit sRGB, which is what both a GTK CSS colour and a tiny-skia paint want.
+/// Straight 8-bit sRGB, which is what a GTK CSS colour wants.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rgb(pub u8, pub u8, pub u8);
 
@@ -27,7 +24,7 @@ impl Rgb {
     }
 }
 
-/// Every colour either frontend paints with, in one of two variants.
+/// Every colour the frontend paints with, in one of two variants.
 ///
 /// The light values are the ones the dashboard was drawn with before there was a dark
 /// one. The dark values keep the same relationships: ink readable on every surface,
@@ -124,8 +121,8 @@ impl Palette {
     }
 }
 
-/// Resolved through fontconfig by both candidates, so Pango and cosmic-text pick the
-/// same file rather than each applying its own idea of a default.
+/// Resolved through fontconfig, so Pango picks the session's own idea of a default
+/// rather than the dashboard carrying a font family of its own.
 pub const FONT: &str = "sans-serif";
 
 /// Only used when the compositor will not maximize the window.

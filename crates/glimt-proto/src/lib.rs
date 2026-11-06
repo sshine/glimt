@@ -21,11 +21,9 @@ pub struct Sample {
 
 /// CLOCK_MONOTONIC in microseconds.
 ///
-/// Both frontends report presentation against this clock: GTK's frame timings come from
-/// `g_get_monotonic_time`, and `wp_presentation` reports whichever clock it advertises,
-/// which is CLOCK_MONOTONIC on every compositor that implements it. Using `Instant`
-/// instead would be the same clock with no way to subtract the compositor's timestamp
-/// from it.
+/// The frontend reports presentation against this clock: GTK's frame timings come from
+/// `g_get_monotonic_time`. Using `Instant` instead would be the same clock with no way
+/// to subtract the compositor's timestamp from it.
 pub fn monotonic_us() -> i64 {
     let mut ts = libc::timespec {
         tv_sec: 0,

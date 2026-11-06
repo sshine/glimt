@@ -6,7 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
-description = "Daemon lifecycle, triggering and latency recording, shared by both frontends"
+description = "Daemon lifecycle, triggering and latency recording for the dashboard"
 
 [lints]
 workspace = true

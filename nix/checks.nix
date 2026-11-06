@@ -2,7 +2,7 @@
 #
 # One derivation per crate, through the same crate2nix instance the binaries are built
 # with, rather than one `cargo clippy` and one `cargo test` over a vendored workspace.
-# Dependencies are the store paths the build already made, so these cost the eight crates
+# Dependencies are the store paths the build already made, so these cost the seven crates
 # in `crates/` and nothing underneath them.
 #
 # `runTests` is what reaches the test targets: it wires the dev-dependencies in and

@@ -1,10 +1,9 @@
 //! The style sheet, generated from the shared palette.
 //!
-//! Written out of the same colours the other candidate paints from, rather than copied
-//! into a `.css` file, because a colour that differs between the two candidates would
-//! read as a rendering difference when comparing screenshots. Taking the palette as an
-//! argument is also what lets the sheet be regenerated when the session switches between
-//! light and dark without reloading the process.
+//! Written out of the shared palette rather than copied into a `.css` file, so the
+//! sheet and the rest of the drawing cannot drift apart. Taking the palette as an
+//! argument is also what lets the sheet be regenerated when the session switches
+//! between light and dark without reloading the process.
 //!
 //! The backdrop goes on a widget this project owns rather than on the window. Putting
 //! it on the window leaves the drawing at the mercy of whichever Adwaita variant the

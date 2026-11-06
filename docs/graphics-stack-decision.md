@@ -1,5 +1,8 @@
 # Choosing the graphics stack
 
+> **Historical note.** This records the comparison that led to GTK4. The second
+> candidate, `glimt-raw`, has since been removed; `crates/glimt` is the only frontend.
+
 ## The question
 
 glimt is meant to behave like Raycast: one key press and the dashboard is there. That
@@ -58,11 +61,10 @@ Resident cost is reported as both RSS and PSS. RSS alone would punish A unfairly
 libraries are already mapped into the GNOME session, so much of what RSS attributes to
 the process is shared with programs that would be running regardless.
 
-Reproduce with:
+The GTK side still reproduces with:
 
 ```sh
-just bench-all 200
-just compare
+just bench 200
 ```
 
 ## Results, first round
@@ -119,12 +121,11 @@ is on pixels rather than on a compositor screenshot:
 
 ```sh
 cargo run --release -p glimt -- --no-portal --screenshot docs/img/glimt.png
-cargo run --release -p glimt-raw  -- --no-portal --screenshot docs/img/glimt-raw.png
 ```
 
 ![Candidate A](img/glimt.png)
 
-![Candidate B](img/glimt-raw.png)
+![Candidate B, historical](img/spike-raw.png)
 
 - **Text.** Both set the Danish line under the week number correctly, ø and å included,
   from the same fontconfig family. Pango and cosmic-text differ in spacing and in how
@@ -230,7 +231,6 @@ nobody is counting. What is left is the argument that was there before, now with
 evidence under it. A fuzzy-search list, a scrolling pane and a text entry are next, and
 each one is another 10 ms on B's keystroke and another hand-built widget.
 
-`crates/glimt-raw` stays, for as long as both are wanted. It earns its place twice over:
-it is the control that says what the compositor's own floor is, so a later regression in
-A can be told apart from a change in mutter, and it is the only one of the two that can
-take a layer surface without a C library in the way.
+The raw candidate was later removed. It had served as the control that says what the
+compositor's own floor is, but the GTK frontend is the dashboard, and a second renderer
+is not worth maintaining for a comparison that has already been made.

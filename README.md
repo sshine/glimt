@@ -4,7 +4,7 @@ A resident dashboard for Linux that appears on a key press, in the shape of Rayc
 one process that stays in memory with its window built, so showing it is a map rather
 than a start.
 
-![The dashboard](docs/img/glimt-raw.png)
+![The dashboard](docs/img/glimt.png)
 
 It shows a calendar taken from [ugenr.dk] and a napkin calculator. The calendar is the
 current week as seven coloured weekday boxes with its week number beside them, and a
@@ -51,31 +51,23 @@ The parser is Rust and the semantics are Scheme. `crates/napkin-math/src/prelude
 holds the value model and the dispatch of the four operators across numbers, amounts,
 dates and durations, which is where another kind of napkin calculation would go.
 
-## The two frontends
+## The frontend
 
-| Crate | Stack |
-| --- | --- |
-| `crates/glimt` | GTK4 with Pango, GSK and a style sheet |
-| `crates/glimt-raw` | smithay-client-toolkit, tiny-skia and cosmic-text, no toolkit |
+The dashboard is `crates/glimt`: GTK4 with Pango, GSK and a style sheet.
 
-`glimt` is what ships and what the NixOS module installs. `glimt-raw` is kept, not
-deprecated: it is the control that says what the compositor's own floor is, so a later
-regression in the GTK one can be told apart from a change in mutter, and it is the only
-one of the two that can take a layer surface without a C library in the way.
-
-Both are kept in step. Everything except the drawing is shared, so a feature is written
-once and drawn twice: `glimt-cal` holds the calendar as data, `napkin-math` the
-calculator, and `glimt-shell` the daemon, the D-Bus service, the global shortcut, the
-design tokens and the light and dark palettes, and `glimt-proto` the three names a
-client needs. Each frontend translates its own key events into that vocabulary and
+Everything below the drawing is shared: `glimt-cal` holds the calendar as data,
+`napkin-math` the calculator, `glimt-shell` the daemon, the D-Bus service, the global
+shortcut, the design tokens and the light and dark palettes, and `glimt-proto` the three
+names a client needs. The frontend translates key events into that vocabulary and
 renders the result.
 
-Neither has a theme switch of its own: both follow the session's light or dark
+The dashboard has no theme switch of its own: it follows the session's light or dark
 preference through the XDG settings portal, including the common case where the session
 is dark through its GTK theme rather than through `color-scheme`. The palette is
-reloaded in place, so switching while the daemon is resident repaints both.
+reloaded in place, so switching while the daemon is resident repaints the window.
 
-The comparison and its numbers are in [docs/graphics-stack-decision.md].
+The comparison that led to GTK4 is kept as history in
+[docs/graphics-stack-decision.md].
 
 ## What the environment decides
 
@@ -85,15 +77,14 @@ window. What is left is an ordinary toplevel, maximized so it fills the work are
 leaves the top bar alone, and the floor on how fast one can appear is mutter's own map
 path rather than the toolkit's.
 
-Two consequences shape both candidates:
+Two consequences shape the dashboard:
 
 - A window shown without an `xdg-activation-v1` token is refused focus and announced as
   a notification instead, so the shortcut comes from the GlobalShortcuts portal, whose
   `Activated` signal carries a token the compositor minted itself.
-- Portability to a compositor that does have layer-shell is kept open in both: GTK
-  through `gtk4-layer-shell`, and the raw candidate through smithay-client-toolkit.
-  `just nested` checks that under a nested wlroots compositor on its headless backend,
-  without leaving GNOME and without taking the screen.
+- Portability to a compositor that does have layer-shell is kept open through
+  `gtk4-layer-shell`. `just nested` checks that under a nested wlroots compositor on its
+  headless backend, without leaving GNOME and without taking the screen.
 
 ## Installing on NixOS
 
@@ -137,7 +128,7 @@ The options:
 
 | Option | Default | |
 | --- | --- | --- |
-| `package` | `pkgs.glimt` | `pkgs.glimt-raw` for the other frontend |
+| `package` | `pkgs.glimt` | the dashboard to run |
 | `shortcut` | `<Super>Return` | GNOME's notation; null leaves the keyboard alone |
 | `months` | `6` | a count that divides the year aligns to its block |
 | `portal` | `false` | register the shortcut through the portal instead |
@@ -196,10 +187,9 @@ font and icon directories being visible to it.
 
 ```sh
 nix develop          # or: direnv allow
-just dev             # the GTK candidate, visible
-just dev glimt-raw   # the other one
+just dev             # the dashboard, visible
 
-just dev glimt-raw --input "13 usd in dkk"   # with something already typed
+just dev glimt --input "13 usd in dkk"   # with something already typed
 ```
 
 As a daemon, which is how it is meant to run:
@@ -212,14 +202,12 @@ just toggle              # or drive it by hand
 ## Measuring
 
 ```sh
-just bench-all 200
-just compare
+just bench 200
 ```
 
-Each run starts the candidate, waits for it, sits idle to measure what being resident
+Each run starts the dashboard, waits for it, sits idle to measure what being resident
 costs, then shows and hides it two hundred times. Latency is counted from the request
-arriving to the compositor's own presentation timestamp, read from `wp_presentation` in
-the raw candidate and from the frame clock in the GTK one.
+arriving to the compositor's own presentation timestamp, read from the frame clock.
 
 [docs/graphics-stack-decision.md]: docs/graphics-stack-decision.md
 [ugenr.dk]: https://www.ugenr.dk/
