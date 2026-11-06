@@ -467,9 +467,9 @@ rec {
       };
       "async-executor" = rec {
         crateName = "async-executor";
-        version = "1.14.0";
+        version = "1.14.1";
         edition = "2021";
-        sha256 = "0al1rmxjy7p7r6h50z698q5lwssqs5a2vzmqbazm1z2sv1rgjsy9";
+        sha256 = "0dsg3ijjbrky4qas8g7nyjpryg1646jsfpmwjxi14df74q8s69pl";
         libName = "async_executor";
         license = "Apache-2.0 OR MIT";
         authors = [
@@ -590,9 +590,9 @@ rec {
       };
       "async-lock" = rec {
         crateName = "async-lock";
-        version = "3.4.2";
+        version = "3.5.0";
         edition = "2021";
-        sha256 = "04c3xrrdrfrvh9v0ajxrangpy38qi76qq268zslphnxxjqjpy3r9";
+        sha256 = "0vwz6v1hnvaq1lx6dgwnsbv9mby3b515m1h8amfx4yh01l5p0xh8";
         libName = "async_lock";
         license = "Apache-2.0 OR MIT";
         authors = [
@@ -1113,7 +1113,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -1129,9 +1129,9 @@ rec {
       };
       "cc" = rec {
         crateName = "cc";
-        version = "1.8.0";
+        version = "1.11.0";
         edition = "2021";
-        sha256 = "0f6q6vc8fj6xn4j1wd4yakiza6lhgwai49gp1zdwgzggh3nwjlb6";
+        sha256 = "0ssz5frnjb3x873yhp2790xf9v8jz8hdbgj28i1gm861rvg8jn9p";
         license = "MIT OR Apache-2.0";
         dependencies = [
           {
@@ -1377,9 +1377,9 @@ rec {
       };
       "clipboard-win" = rec {
         crateName = "clipboard-win";
-        version = "5.4.1";
+        version = "5.4.3";
         edition = "2018";
-        sha256 = "1m44gqy11rq1ww7jls86ppif98v6kv2wkwk8p17is86zsdq3gq5x";
+        sha256 = "16isdlcwrj0jgjs5k5c0jvr15mqrs1knlyms2bdcrzk6hj3zfah5";
         libName = "clipboard_win";
         license = "BSL-1.0";
         authors = [
@@ -2045,9 +2045,9 @@ rec {
       };
       "crc32fast" = rec {
         crateName = "crc32fast";
-        version = "1.5.2";
+        version = "1.5.4";
         edition = "2021";
-        sha256 = "0y0f955n2hr5a8rd9nw9sr23nhjc42ddx3bjc47dnlmqssgpk9q1";
+        sha256 = "017g8wq37261s7i21v2p7wacl8pr3p4why0d9dfd2dskdm0x75sz";
         license = "MIT OR Apache-2.0";
         authors = [
           "Sam Rijs <srijs@airpost.net>"
@@ -2635,9 +2635,9 @@ rec {
       };
       "find-msvc-tools" = rec {
         crateName = "find-msvc-tools";
-        version = "0.1.14";
+        version = "0.1.15";
         edition = "2021";
-        sha256 = "112ljldlv150fpl8xr2jl5czg51k3kdfn6cy5fqdsvkl14sgpp5f";
+        sha256 = "0j5sh4lb7g8xh6kd67s0vz037ah5hlp9f2rbgbg9f41rqmf92rhw";
         libName = "find_msvc_tools";
         license = "MIT OR Apache-2.0";
 
@@ -3018,7 +3018,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -3142,7 +3142,7 @@ rec {
           }
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -3499,7 +3499,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -3732,7 +3732,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -3757,7 +3757,7 @@ rec {
       };
       "glimt" = rec {
         crateName = "glimt";
-        version = "0.2.1";
+        version = "0.3.0";
         edition = "2024";
         crateBin = [
           {
@@ -3820,7 +3820,7 @@ rec {
       };
       "glimt-bench" = rec {
         crateName = "glimt-bench";
-        version = "0.2.1";
+        version = "0.3.0";
         edition = "2024";
         crateBin = [
           {
@@ -3868,7 +3868,7 @@ rec {
       };
       "glimt-cal" = rec {
         crateName = "glimt-cal";
-        version = "0.2.1";
+        version = "0.3.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/glimt-cal; };
         libName = "glimt_cal";
@@ -3885,7 +3885,7 @@ rec {
       };
       "glimt-proto" = rec {
         crateName = "glimt-proto";
-        version = "0.2.1";
+        version = "0.3.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/glimt-proto; };
         libName = "glimt_proto";
@@ -3906,7 +3906,7 @@ rec {
       };
       "glimt-shell" = rec {
         crateName = "glimt-shell";
-        version = "0.2.1";
+        version = "0.3.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/glimt-shell; };
         libName = "glimt_shell";
@@ -3966,7 +3966,7 @@ rec {
       };
       "glimtctl" = rec {
         crateName = "glimtctl";
-        version = "0.2.1";
+        version = "0.3.0";
         edition = "2024";
         crateBin = [
           {
@@ -4021,7 +4021,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -4088,7 +4088,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -4200,7 +4200,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -4503,7 +4503,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -4911,9 +4911,9 @@ rec {
       };
       "js-sys" = rec {
         crateName = "js-sys";
-        version = "0.3.106";
+        version = "0.3.107";
         edition = "2021";
-        sha256 = "1icwmpjw54lb7vg5926k5y4y5jbiih0zxhwgjwnzn475v90xk0vq";
+        sha256 = "0fjdb084avbdxqb6n14lzszwn91wg88npasfym7bz2q9ahhrvh4d";
         libName = "js_sys";
         license = "MIT OR Apache-2.0";
         authors = [
@@ -5045,9 +5045,9 @@ rec {
       };
       "log" = rec {
         crateName = "log";
-        version = "0.4.34";
+        version = "0.4.35";
         edition = "2021";
-        sha256 = "1ihkzn0m33ab79fcl4mkb04n5iwqzbxzyw7l7hazqkffaqzbvy7r";
+        sha256 = "0p002750b2hab9bnlxxrvk5g9dvyaf23kiy39s6wsi6s29nzh5ax";
         license = "MIT OR Apache-2.0";
         authors = [
           "The Rust Project Developers"
@@ -5406,9 +5406,9 @@ rec {
       };
       "mime" = rec {
         crateName = "mime";
-        version = "0.3.17";
+        version = "0.3.18";
         edition = "2015";
-        sha256 = "16hkibgvb9klh0w0jk5crr5xv90l3wlf77ggymzjmvl1818vnxv8";
+        sha256 = "18dzfqp5gaza7lg8qqpq1xh83zw79b1al3zryaacy5w1krd8z16m";
         license = "MIT OR Apache-2.0";
         authors = [
           "Sean McArthur <sean@seanmonstar.com>"
@@ -5498,7 +5498,7 @@ rec {
       };
       "napkin-math" = rec {
         crateName = "napkin-math";
-        version = "0.2.1";
+        version = "0.3.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/napkin-math; };
         libName = "napkin_math";
@@ -6042,7 +6042,7 @@ rec {
         buildDependencies = [
           {
             name = "system-deps";
-            packageId = "system-deps 9.0.0";
+            packageId = "system-deps 9.0.1";
           }
         ];
         features = {
@@ -6762,9 +6762,9 @@ rec {
       };
       "roxmltree" = rec {
         crateName = "roxmltree";
-        version = "0.21.1";
+        version = "0.21.2";
         edition = "2021";
-        sha256 = "1fxc3jgvl2rk05bw0hj86azqg6mzlijh06gyi9pw69b1qw84p5pi";
+        sha256 = "01srvmbc48n5yp0c0hzvg8ahzmgs4n4h3qgyh6qhb55h529zb9wx";
         license = "MIT OR Apache-2.0";
         authors = [
           "Yevhenii Reizner <razrfalcon@gmail.com>"
@@ -6939,9 +6939,9 @@ rec {
       };
       "rustix" = rec {
         crateName = "rustix";
-        version = "1.1.5";
+        version = "1.1.6";
         edition = "2021";
-        sha256 = "17b2srw7rcqmrs1shj89g8i3r1447lihv7qrbxvp11j1psxgl7l9";
+        sha256 = "1ajqv2zxmfms30hhvp5bdzpixn5xqnz7s871vpa56h99wm16grz5";
         license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT";
         authors = [
           "Dan Gohman <dev@sunfishcode.online>"
@@ -7035,7 +7035,7 @@ rec {
           "process" = [ "linux-raw-sys/prctl" ];
           "pty" = [ "fs" ];
           "runtime" = [ "linux-raw-sys/prctl" ];
-          "rustc-dep-of-std" = [ "core" "rustc-std-workspace-alloc" "linux-raw-sys/rustc-dep-of-std" "bitflags/rustc-dep-of-std" ];
+          "rustc-dep-of-std" = [ "core" "rustc-std-workspace-alloc" "linux-raw-sys/rustc-dep-of-std" ];
           "rustc-std-workspace-alloc" = [ "dep:rustc-std-workspace-alloc" ];
           "shm" = [ "fs" ];
           "std" = [ "bitflags/std" "alloc" "libc?/std" "libc_errno?/std" ];
@@ -7140,9 +7140,9 @@ rec {
       };
       "rustls-webpki" = rec {
         crateName = "rustls-webpki";
-        version = "0.103.15";
+        version = "0.103.16";
         edition = "2021";
-        sha256 = "1hhanq3lz384v4nccacnjfwsyy99n3yc6m6iw8kljz8yicfwzhzk";
+        sha256 = "10djm2f00xzi5qlbcfqjhhn2smk2h9aw8b4l74qncz4xsfvb2hs4";
         libName = "webpki";
         license = "ISC";
         dependencies = [
@@ -7871,9 +7871,9 @@ rec {
       };
       "smallvec" = rec {
         crateName = "smallvec";
-        version = "1.16.3";
+        version = "1.16.4";
         edition = "2018";
-        sha256 = "06z0akmcq2zc9qg22dxda298p50gg3di5ggl3y2nllag8ypwhgav";
+        sha256 = "1j772prjisi2872lxry7d9fkss3dfbjwl16jmsvvp2qvk2qx9mfh";
         license = "MIT OR Apache-2.0";
         authors = [
           "The Servo Project Developers"
@@ -8136,11 +8136,11 @@ rec {
         };
         resolvedDefaultFeatures = [ "default" ];
       };
-      "system-deps 9.0.0" = rec {
+      "system-deps 9.0.1" = rec {
         crateName = "system-deps";
-        version = "9.0.0";
+        version = "9.0.1";
         edition = "2018";
-        sha256 = "17s2zw45h1649smy52hb7h77cby0lkhcy4spg69zzw51phnaw3ca";
+        sha256 = "0zf60c6fww4mjljs1di39rf13qrv2sqfw3iy6khdaqdcib9ilmfv";
         libName = "system_deps";
         license = "MIT OR Apache-2.0";
         authors = [
@@ -8268,9 +8268,9 @@ rec {
       };
       "toml" = rec {
         crateName = "toml";
-        version = "1.1.8+spec-1.1.0";
+        version = "1.2.0+spec-1.1.0";
         edition = "2024";
-        sha256 = "13b7kqvw7aa4x08i03d2fpima1i75v0lqxl0wrmisx6qwh09wj10";
+        sha256 = "0qg503lsxqgbpn28bspgglmz8m08iqdzxhbmsszxndh4ypwcvzy5";
         license = "MIT OR Apache-2.0";
         dependencies = [
           {
@@ -8355,9 +8355,9 @@ rec {
       };
       "toml_edit" = rec {
         crateName = "toml_edit";
-        version = "0.25.17+spec-1.1.0";
+        version = "0.25.18+spec-1.1.0";
         edition = "2024";
-        sha256 = "174w1b2fjg1jb0wi7384v1m59g7ga79458i022gafjakpddisr73";
+        sha256 = "15hkw83x94drmc7d1xgg3j5485pijzfajbr1il6l5f8dsy5ygihy";
         license = "MIT OR Apache-2.0";
         dependencies = [
           {
@@ -8412,9 +8412,9 @@ rec {
       };
       "toml_writer" = rec {
         crateName = "toml_writer";
-        version = "1.1.3+spec-1.1.0";
+        version = "1.2.0+spec-1.1.0";
         edition = "2024";
-        sha256 = "0w17cps8mfg7wcwyp0gggi9cpgmxldb9pwl55qp8ssq5zj6bvg86";
+        sha256 = "0fp14qh313y31pqddn2bhk01l7ygx70f9fxfhgpma77i01vvp780";
         license = "MIT OR Apache-2.0";
         features = {
           "default" = [ "std" ];
@@ -8745,9 +8745,9 @@ rec {
       };
       "unicode-width" = rec {
         crateName = "unicode-width";
-        version = "0.2.2";
+        version = "0.2.3";
         edition = "2021";
-        sha256 = "0m7jjzlcccw716dy9423xxh0clys8pfpllc5smvfxrzdf66h9b5l";
+        sha256 = "0mymrsdklcgys4fndds2h2hasij36gyalcqy4nghb4k9hxqq8wfa";
         libName = "unicode_width";
         license = "MIT OR Apache-2.0";
         authors = [
@@ -8786,9 +8786,9 @@ rec {
       };
       "ureq" = rec {
         crateName = "ureq";
-        version = "3.4.2";
+        version = "3.5.1";
         edition = "2024";
-        sha256 = "1z6pmhf27s54f3sn2ja1rnqsrnbnjq2lr5xzpl5nwwmpx45w4yls";
+        sha256 = "17axamxyk5rva42fh7cfgji7b6ygv2h3qhk24009hwfzddl7dgp7";
         license = "MIT OR Apache-2.0";
         authors = [
           "Martin Algesten <martin@algesten.se>"
@@ -8871,7 +8871,6 @@ rec {
           "rustls" = [ "rustls-no-provider" "_ring" "rustls-webpki-roots" ];
           "rustls-no-provider" = [ "dep:rustls" "_tls" "_rustls" ];
           "rustls-webpki-roots" = [ "dep:webpki-roots" ];
-          "socks-proxy" = [ "dep:socks" ];
           "vendored" = [ "native-tls?/vendored" ];
           "win-system-proxy" = [ "dep:winreg" ];
         };
@@ -8879,9 +8878,9 @@ rec {
       };
       "ureq-proto" = rec {
         crateName = "ureq-proto";
-        version = "0.6.5";
+        version = "0.7.1";
         edition = "2024";
-        sha256 = "08p98vprc5bxqy3vm0as5qxa19a3gwasws4m85cpv7886vy865c4";
+        sha256 = "1csy33qzrn2sq40imrda0r22pw8q99sfjqrzv1k584ajq8rwwbb2";
         libName = "ureq_proto";
         license = "MIT OR Apache-2.0";
         authors = [
@@ -8947,9 +8946,9 @@ rec {
       };
       "uuid" = rec {
         crateName = "uuid";
-        version = "1.28.0";
+        version = "1.29.0";
         edition = "2021";
-        sha256 = "01mnlhz09hwdjaxwzjd6bql3fjb5zl9n8dzaxn7dvdxyhiiiihbw";
+        sha256 = "0525458ww4jwa0nw513jdrhgwxrldglzvfrbw5gnjl0cc88js3ja";
         license = "Apache-2.0 OR MIT";
         authors = [
           "Ashley Mannix<ashleymannix@live.com.au>"
@@ -9099,9 +9098,9 @@ rec {
       };
       "wasm-bindgen" = rec {
         crateName = "wasm-bindgen";
-        version = "0.2.129";
+        version = "0.2.130";
         edition = "2021";
-        sha256 = "02flhqld01jqb6vbfyx1gb8s78g1pnq2164daxad93y6mhrlzdcv";
+        sha256 = "071xi9mqha1vdrxsjgndjgcf0azkl8g5yahkn2qbiiynvla1q650";
         libName = "wasm_bindgen";
         license = "MIT OR Apache-2.0";
         authors = [
@@ -9111,11 +9110,6 @@ rec {
           {
             name = "cfg-if";
             packageId = "cfg-if";
-          }
-          {
-            name = "once_cell";
-            packageId = "once_cell";
-            usesDefaultFeatures = false;
           }
           {
             name = "wasm-bindgen-macro";
@@ -9145,9 +9139,9 @@ rec {
       };
       "wasm-bindgen-macro" = rec {
         crateName = "wasm-bindgen-macro";
-        version = "0.2.129";
+        version = "0.2.130";
         edition = "2021";
-        sha256 = "0dc5xq09sy1v9ns1fhb0cnyqz5p1wcjjvkdmxskj9qhnbg1x0a9f";
+        sha256 = "1ncfybmdiczbsjz8a257a13k8n7dnl15khvgjrkbzgcslc11m4vf";
         procMacro = true;
         libName = "wasm_bindgen_macro";
         license = "MIT OR Apache-2.0";
@@ -9170,9 +9164,9 @@ rec {
       };
       "wasm-bindgen-macro-support" = rec {
         crateName = "wasm-bindgen-macro-support";
-        version = "0.2.129";
+        version = "0.2.130";
         edition = "2021";
-        sha256 = "1dx6w90f14avmhri7ss9lyz03060g6475r4axy3bm7biqf5ill3g";
+        sha256 = "0fm58fh6gkhlmi15rhzvcgz35x5s6kkvi9ik3s1vsmg4h11bb91c";
         libName = "wasm_bindgen_macro_support";
         license = "MIT OR Apache-2.0";
         authors = [
@@ -9207,10 +9201,10 @@ rec {
       };
       "wasm-bindgen-shared" = rec {
         crateName = "wasm-bindgen-shared";
-        version = "0.2.129";
+        version = "0.2.130";
         edition = "2021";
         links = "wasm_bindgen";
-        sha256 = "1ilmp5d3sl8lrq9djhcs90gk66yvk8mgwk4sfrvpvkd75b2wkw13";
+        sha256 = "17iq85zyk1z7hq533c0apj5ix0y0ks35fbszxv31cl3jk0vrq7rv";
         libName = "wasm_bindgen_shared";
         license = "MIT OR Apache-2.0";
         authors = [
@@ -9280,9 +9274,9 @@ rec {
       };
       "webpki-roots" = rec {
         crateName = "webpki-roots";
-        version = "1.0.9";
+        version = "1.0.11";
         edition = "2021";
-        sha256 = "0apja04243wz3vi26pqjg4sq8cqaac66prj490sgb1crlc4rvkbx";
+        sha256 = "0wgidma8qmksdhmx8pnbpg8m1zx08llqbqz7gn7br1xjnaxq1wpm";
         libName = "webpki_roots";
         license = "CDLA-Permissive-2.0";
         dependencies = [
@@ -10794,9 +10788,9 @@ rec {
       };
       "winnow" = rec {
         crateName = "winnow";
-        version = "1.0.4";
+        version = "1.0.5";
         edition = "2021";
-        sha256 = "10fzxipa7lx16172p3aca9j60hzbqgjki2f95kqksd5qywcp7f93";
+        sha256 = "1vvs4zmisyxxp1igpjpi87z26d6wl3q98shcvx68gazhklcr6fwc";
         license = "MIT";
         dependencies = [
           {
@@ -11098,9 +11092,9 @@ rec {
       };
       "zcheapstr" = rec {
         crateName = "zcheapstr";
-        version = "1.1.0";
+        version = "1.2.0";
         edition = "2024";
-        sha256 = "0wwlv70bi2rydvvzfq249q6i51mjx85c4m2wxcx1hra5c18yrbyi";
+        sha256 = "084rpjymhbqcb96rbp1a2lhvr2sng1pnvjx52m1h9gnfkrnii7wk";
         license = "MIT";
         authors = [
           "Zeeshan Ali Khan <zeeshanak@gnome.org>"

@@ -99,6 +99,41 @@ check *args:
 ci: check lock-check crate2nix-check
     @echo "All CI checks passed!"
 
+# Move the workspace to a new version and refresh everything derived from it
+#
+# The version has one home, [workspace.package] in Cargo.toml; every member inherits it
+# with `version.workspace = true` and the internal path dependencies carry no version at
+# all.
+#
+# One line to edit, one command to type.
+bump version:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [[ ! "{{version}}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+      echo "not a semver version: {{version}}" >&2
+      exit 1
+    fi
+
+    tmp="$(mktemp)"
+    trap 'rm -f "$tmp"' EXIT
+    awk -v version="{{version}}" '
+      /^\[workspace\.package\]$/ { in_package = 1 }
+      in_package && /^version = / {
+        sub(/= ".*"/, "= \"" version "\"")
+        in_package = 0
+      }
+      { print }
+    ' Cargo.toml > "$tmp"
+    if ! grep -qx "version = \"{{version}}\"" "$tmp"; then
+      echo "no version line in [workspace.package] of Cargo.toml" >&2
+      exit 1
+    fi
+    mv "$tmp" Cargo.toml
+    trap - EXIT
+
+    cargo update --workspace
+    just crate2nix
+
 release_targets := "x86_64-unknown-linux-musl aarch64-unknown-linux-musl"
 
 # Assert the release tag names the version cargo would publish

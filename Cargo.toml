@@ -3,20 +3,22 @@ resolver = "2"
 members = ["crates/*"]
 
 [workspace.package]
-version = "0.2.1"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/sshine/glimt"
 homepage = "https://github.com/sshine/glimt"
 
-# Versions live here and the crates inherit them; feature sets stay with the crate that
-# needs them, since those are what differ between members.
+# Versions live only in [workspace.package]; a member inherits it with
+# `version.workspace = true`. The internal path dependencies deliberately carry no
+# `version`, so there is no second copy to bump on each release. (Cargo only needs one
+# when a crate is published to a registry, which these are not.)
 [workspace.dependencies]
-glimt-cal = { version = "0.2.1", path = "crates/glimt-cal" }
-glimt-proto = { version = "0.2.1", path = "crates/glimt-proto" }
-glimt-shell = { version = "0.2.1", path = "crates/glimt-shell" }
-napkin-math = { version = "0.2.1", path = "crates/napkin-math" }
+glimt-cal = { path = "crates/glimt-cal" }
+glimt-proto = { path = "crates/glimt-proto" }
+glimt-shell = { path = "crates/glimt-shell" }
+napkin-math = { path = "crates/napkin-math" }
 
 anyhow = "1.0"
 async-channel = "2"
