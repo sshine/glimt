@@ -4,12 +4,26 @@ on:
   push:
     tags:
       - 'v*'
+  # A manual run can build and smoke-test just the AppImage, without waiting for the
+  # static client build or publishing a release. The version must match the crate
+  # version of the checked-out ref.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag to build, e.g. v0.3.0'
+        required: true
+      appimage_only:
+        description: 'Build and smoke-test only the AppImage'
+        type: boolean
+        default: true
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      RELEASE_VERSION: ${{ inputs.version || github.ref_name }}
 
     steps:
       - name: Checkout
@@ -40,34 +54,54 @@ jobs:
           purge-primary-key: never
 
       # Gate the release on the same checks CI runs, so a tag can never publish
-      # something that would have failed on main.
+      # something that would have failed on main. An AppImage-only manual run skips
+      # this: it exists to exercise the wrapper, not to publish.
       - name: Flake check
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.appimage_only }}
         run: nix flake check -L
 
       - name: Verify Cargo.lock and Cargo.nix
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.appimage_only }}
         run: nix develop -c just lock-check crate2nix-check
 
-      # The client is the only static binary. The dashboard links GTK, so a static musl
-      # build of it is not a thing that exists; `just dist` also builds it as an
-      # AppImage with its whole runtime closure.
-      #
-      # This is the one step that shares nothing with the check above: a crate compiled
-      # for musl is a different compilation from the same crate compiled for the host,
-      # so the client's dependencies are built here and nowhere else.
-      - name: Build the static client and the dashboard AppImage
-        run: nix develop -c just dist "${GITHUB_REF_NAME}"
+      # The AppImage is the artifact that has to run on a machine without Nix, so it is
+      # built and smoke-tested first. The static client is a separate musl compilation
+      # and takes most of the release time; doing it after the AppImage means a broken
+      # wrapper fails the job in minutes instead of after the client build.
+      - name: Build the dashboard AppImage
+        run: nix develop -c just appimage "${RELEASE_VERSION}"
 
-      - name: Smoke-test the x86_64 client
+      # Ubuntu 24.04 and later restrict unprivileged user namespaces with AppArmor by
+      # default. nix-appimage's AppRun creates a user namespace and writes uid_map, so
+      # the smoke test needs the restriction off on the ephemeral runner. This is a
+      # test-host workaround, not something the artifact can assume on a user's machine.
+      - name: Allow unprivileged user namespaces for the AppImage
         run: |
-          tar -xzf "dist/glimtctl-${GITHUB_REF_NAME}-x86_64-unknown-linux-musl.tar.gz" -C /tmp
-          /tmp/glimtctl --version
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
 
       - name: Smoke-test the x86_64 AppImage
         run: |
-          chmod +x dist/glimt-*-x86_64.AppImage
-          ./dist/glimt-*-x86_64.AppImage --version
+          appimage="dist/glimt-${RELEASE_VERSION}-x86_64.AppImage"
+          chmod +x "$appimage"
+          "$appimage" --version
+
+      # This is the one step that shares nothing with the check above: a crate compiled
+      # for musl is a different compilation from the same crate compiled for the host,
+      # so the client's dependencies are built here and nowhere else.
+      - name: Build the static client
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.appimage_only }}
+        run: nix develop -c just dist-client "${RELEASE_VERSION}"
+
+      - name: Smoke-test the x86_64 client
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.appimage_only }}
+        run: |
+          tar -xzf "dist/glimtctl-${RELEASE_VERSION}-x86_64-unknown-linux-musl.tar.gz" -C /tmp
+          /tmp/glimtctl --version
 
       - name: Create GitHub Release
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2, 2026-07-13
         with:
           generate_release_notes: true

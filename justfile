@@ -143,20 +143,29 @@ check-version version:
         echo "tag {{version}} does not match crate version $crate" >&2; exit 1; \
     fi
 
-# Build the static client and its checksums into dist/.
-#
 # Only the client is a static binary. The dashboard links GTK, so a static musl build of
 # it is not a thing that exists; it ships as the AppImage that `appimage` adds to the
 # same directory.
-dist version: (check-version version)
-    rm -rf dist && mkdir -p dist
+#
+# Build the static client and its checksums into dist/.
+dist-client version: (check-version version)
+    mkdir -p dist
     set -e; for target in {{release_targets}}; do \
         cargo build --release --locked --target "$target" -p glimtctl; \
         name="glimtctl-{{version}}-$target"; \
         tar -czf "dist/$name.tar.gz" -C "target/$target/release" glimtctl; \
         ( cd dist && sha256sum "$name.tar.gz" > "$name.tar.gz.sha256" ); \
     done
+    @ls -1 dist/*.tar.gz*
+
+# The AppImage goes first: it is the artifact that has to run on another machine, and the
+# release workflow smoke-tests it before spending the time on the static client.
+#
+# Build both release artifacts into a clean dist/.
+dist version: (check-version version)
+    rm -rf dist && mkdir -p dist
     just appimage {{version}}
+    just dist-client {{version}}
     @ls -1 dist
 
 # Build the dashboard as a single-file AppImage for the host architecture.
@@ -164,7 +173,8 @@ dist version: (check-version version)
 # The AppImage carries the whole runtime closure, so it does not need Nix, GTK or the
 # Nix store on the machine that runs it. It is built by the flake rather than by cargo:
 # see nix/appimage.nix.
-appimage version:
+appimage version: (check-version version)
+    mkdir -p dist
     nix build .#glimt-appimage
     name="glimt-{{version}}-$(uname -m).AppImage"; \
     cp -fL result "dist/$name"; \
