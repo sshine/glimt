@@ -21,15 +21,15 @@
     }:
     let
       release = {
-        version = "0.2.1";
+        version = "0.3.0";
 
         appimageHashes = {
-          "x86_64-linux" = "sha256-Nq7iUKpCPz75Ni2wPlaiiV7MDgBi56miWrKxbxhrhOI=";
+          "x86_64-linux" = "sha256-HM3CqL+SDPNZ8B9jHgK5hu3aHBSutItBsn8sO7AvPNo=";
         };
 
         clientHashes = {
-          "x86_64-linux" = "sha256-HNZHlqTxRV23c95c/XPMJprtJDJVCYmVnlOXkEtYalA=";
-          "aarch64-linux" = "sha256-NZU2VUSrCBx8jmEf4dyvtDHimV5h6O1V4eZ2/rHWIcc=";
+          "x86_64-linux" = "sha256-LnFo/bodFi9m1+UzNBcY9qKnCbsJFlNS8LCaWNRQG6A=";
+          "aarch64-linux" = "sha256-NEOxSw1dd3udyUTTU071AcVrMDJ+O60y2aSL+rbjwjY=";
         };
       };
 
