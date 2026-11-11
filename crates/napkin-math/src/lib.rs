@@ -1,10 +1,10 @@
 //! A napkin calculator.
 //!
-//! Infix arithmetic, currency conversion and date arithmetic, parsed in Rust and
-//! evaluated in Scheme. The split is deliberate: the parser is a pure function of a
-//! string and is tested as a table, and the semantics live in `prelude.scm` where adding
-//! another kind of napkin calculation means writing a few lines of Scheme rather than
-//! another match arm.
+//! Infix arithmetic, currency conversion, date arithmetic and IPv4 CIDR ranges, parsed
+//! in Rust and evaluated in Scheme. The split is deliberate: the parser is a pure
+//! function of a string and is tested as a table, and the semantics live in
+//! `prelude.scm` where adding another kind of napkin calculation means writing a few
+//! lines of Scheme rather than another match arm.
 //!
 //! ```text
 //! 2 + 3 * 4            -> 14
@@ -13,6 +13,7 @@
 //! 13 dkk               ->  1,74 EUR      kroner cannot be converted to kroner
 //! today + 7 days       -> a date, and eight days painted on the calendar
 //! 2026-10-19 + 30 days -> onsdag 18. november 2026
+//! 10.4.64.37/23        -> the first and last address, and the usual gateway
 //! ```
 //!
 //! Everything is evaluated on every keystroke, so most of what this sees is a prefix of
@@ -21,6 +22,7 @@
 
 use chrono::{Local, NaiveDate};
 
+pub mod cidr;
 pub mod engine;
 pub mod format;
 pub mod lexer;
@@ -30,6 +32,7 @@ pub mod sexp;
 pub mod span;
 pub mod value;
 
+pub use cidr::Cidr;
 pub use engine::{Engine, EngineError};
 pub use parser::{Expr, ParseError, parse};
 pub use rates::{Rates, Source};
@@ -108,6 +111,9 @@ impl Napkin {
         let expr = match parse(input) {
             Ok(expr) => expr,
             Err(ParseError::Empty) => return Outcome::Empty,
+            // A malformed range is the one parse error worth saying out loud: `/33` is
+            // not a prefix that more typing can rescue.
+            Err(ParseError::BadCidr(message)) => return Outcome::Problem(message),
             Err(_) => return Outcome::Incomplete,
         };
 

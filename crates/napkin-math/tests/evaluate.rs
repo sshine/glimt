@@ -187,6 +187,42 @@ fn arithmetic_paints_nothing() {
 }
 
 #[test]
+fn a_cidr_range_shows_its_first_and_last_address() {
+    assert_eq!(
+        text("10.4.64.37/23"),
+        "10.4.64.0 – 10.4.65.255, gateway 10.4.64.1"
+    );
+    assert_eq!(
+        text("192.168.1.130/25"),
+        "192.168.1.128 – 192.168.1.255, gateway 192.168.1.129"
+    );
+
+    // The whole range, which is all a /0 leaves to say.
+    assert_eq!(
+        text("0.0.0.0/0"),
+        "0.0.0.0 – 255.255.255.255, gateway 0.0.0.1"
+    );
+}
+
+#[test]
+fn a_single_address_has_no_second_address_to_call_a_gateway() {
+    assert_eq!(text("10.4.64.37"), "10.4.64.37 – 10.4.64.37");
+    assert_eq!(text("10.4.64.37/32"), "10.4.64.37 – 10.4.64.37");
+}
+
+#[test]
+fn a_prefix_that_cannot_exist_is_reported() {
+    assert_eq!(problem("10.4.64.37/33"), "ugyldigt CIDR-præfiks: /33");
+    assert_eq!(problem("10.4.64.256/23"), "ugyldig IP-adresse: 10.4.64.256");
+}
+
+#[test]
+fn dotted_numbers_are_still_numbers_and_divisions() {
+    assert_eq!(text("10.4"), "10,4");
+    assert_eq!(text("2.5/2"), "1,25");
+}
+
+#[test]
 fn nothing_typed_says_nothing() {
     assert_eq!(napkin().evaluate(""), Outcome::Empty);
     assert_eq!(napkin().evaluate("   "), Outcome::Empty);
@@ -210,6 +246,9 @@ fn a_half_typed_expression_is_never_complained_about() {
         "2,",
         "(2+3",
         "7 w",
+        "10.4.6",
+        "10.4.64.",
+        "10.4.64.37/",
     ] {
         assert_eq!(
             napkin().evaluate(input),

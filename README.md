@@ -19,6 +19,7 @@ Two levels, told apart by whether anything has been typed.
 | --- | --- | --- |
 | Escape | clear the input | dismiss the window |
 | Ctrl+Q | clear it, return to today, dismiss | the same |
+| Ctrl+V | paste from the clipboard | the same |
 | up / down | move the selection a day | the same |
 | Ctrl+up / down | move the selection a week | the same |
 | anything printable | goes to the calculator | the same |
@@ -36,12 +37,17 @@ exits on `glimtctl quit`.
 today + 7 days        mandag 26. oktober 2026, and eight days painted on the grid
 2026-10-19 + 30 days  onsdag 18. november 2026
 2026-11-18 - 2026-10-19   30 dage, painted between the two
+10.4.64.37/23        10.4.64.0 – 10.4.65.255, gateway 10.4.64.1
 ```
 
 Whitespace is ignored, a comma is a decimal point, and words may be Danish or English.
 Rates come from the European Central Bank's daily reference file, fetched at startup and
 once a day, cached under `$XDG_CACHE_HOME/glimt/`, with a compiled-in table for the
 first run and for being offline. An answer says which day's rates it used.
+
+A CIDR range is shown as its first and last address. The gateway beside it is the second
+address in the range, which is a common convention rather than something the prefix says:
+a gateway is configured, and can be any address in the range.
 
 Half a typed expression is not an error, and is never reported as one: the previous
 answer stays, greyed, and nothing else happens. `13 u` is on its way to `13 usd`, so it

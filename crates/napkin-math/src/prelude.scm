@@ -5,6 +5,7 @@
 ;;   (money amount currency)
 ;;   (date days-from-the-common-era)
 ;;   (duration days)
+;;   (cidr address prefix), where the address is its 32 bits
 ;;
 ;; Every step returns (ok value) or (err "besked"), so a failure anywhere stops the
 ;; calculation and reaches the caller as a message rather than as an exception. That
@@ -32,14 +33,18 @@
 (define (money? v) (tagged? v 'money))
 (define (date? v) (tagged? v 'date))
 (define (duration? v) (tagged? v 'duration))
+(define (cidr? v) (tagged? v 'cidr))
 
 (define (amount-of m) (cadr m))
 (define (currency-of m) (caddr m))
 (define (days-of v) (cadr v))
+(define (address-of v) (cadr v))
+(define (prefix-of v) (caddr v))
 
 (define (make-money a c) (list 'money a c))
 (define (make-date d) (list 'date d))
 (define (make-duration d) (list 'duration d))
+(define (make-cidr a p) (list 'cidr a p))
 
 ;; A date moves by whole days, so a fractional duration is rounded on the way in.
 (define (whole d) (exact (round d)))
@@ -144,6 +149,7 @@
                   (if (number? v)
                       (ok (make-duration (whole (* v (cadr args)))))
                       (err "en varighed skal være et tal")))))
+         ((cidr) (ok (make-cidr (car args) (cadr args))))
          ((neg) (bind (evaluate (car args) rates) negate))
          ((convert)
           (bind (evaluate (car args) rates)

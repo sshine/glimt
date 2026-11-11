@@ -2,6 +2,8 @@
 
 use chrono::NaiveDate;
 
+use crate::cidr::Cidr;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Number(f64),
@@ -15,6 +17,8 @@ pub enum Value {
     Duration {
         days: i64,
     },
+    /// An IPv4 range, kept as its address and prefix so its bounds can be shown.
+    Cidr(Cidr),
 }
 
 /// Days a unit word is worth, or `None` if it is not a duration at all.

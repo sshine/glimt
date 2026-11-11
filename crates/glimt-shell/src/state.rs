@@ -23,6 +23,8 @@ const WEEK: i64 = 7;
 pub enum Action {
     /// A printable character, which goes into the calculator wherever the selection is.
     Type(char),
+    /// Text from the clipboard, appended where the caret is.
+    Paste(String),
     Backspace,
     /// One level back.
     Escape,
@@ -185,6 +187,22 @@ impl AppState {
             Action::Type(character) => {
                 self.hold_cursor();
                 self.input.push(character);
+                self.recompute();
+                Response::Redraw
+            }
+
+            Action::Paste(text) => {
+                self.hold_cursor();
+
+                // The calculator is one line, and a clipboard often is not: a copied
+                // `ip addr` line may carry a newline, and a selection may carry the
+                // indentation around it. Flattening the whitespace keeps the bar a bar.
+                let text = text.split_whitespace().collect::<Vec<_>>().join(" ");
+
+                if text.is_empty() {
+                    return Response::Ignored;
+                }
+                self.input.push_str(&text);
                 self.recompute();
                 Response::Redraw
             }

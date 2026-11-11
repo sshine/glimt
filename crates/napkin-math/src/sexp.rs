@@ -73,6 +73,14 @@ fn lower_expr(expr: &Expr, today: NaiveDate, rates: &Rates) -> Result<Value, Low
         Expr::Date(date) => Ok(date_datum(*date)),
         Expr::Today => Ok(date_datum(today)),
 
+        // The address travels as one number and the prefix beside it, which is the whole
+        // of what the renderer needs and leaves the Scheme side a simple tagged list.
+        Expr::Cidr(cidr) => Ok(lists::slice_to_list(&[
+            symbol("cidr"),
+            Value::from(i64::from(cidr.bits())),
+            Value::from(i64::from(cidr.prefix())),
+        ])),
+
         Expr::Unit { value, unit } => {
             let inner = lower_expr(value, today, rates)?;
 

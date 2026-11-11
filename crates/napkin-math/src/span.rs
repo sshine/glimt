@@ -49,7 +49,7 @@ fn collect(expr: &Expr, today: NaiveDate, out: &mut Vec<NaiveDate>) {
     match expr {
         Expr::Today => out.push(today),
         Expr::Date(date) => out.push(*date),
-        Expr::Number(_) => {}
+        Expr::Number(_) | Expr::Cidr(_) => {}
         Expr::Unit { value, .. } | Expr::Neg(value) | Expr::Convert { value, .. } => {
             collect(value, today, out);
         }

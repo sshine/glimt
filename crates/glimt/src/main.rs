@@ -309,6 +309,10 @@ impl App {
             let control = modifiers.contains(gtk::gdk::ModifierType::CONTROL_MASK);
 
             let action = match key {
+                gtk::gdk::Key::v | gtk::gdk::Key::V if control => {
+                    app.paste();
+                    return glib::Propagation::Stop;
+                }
                 gtk::gdk::Key::Escape => Action::Escape,
                 gtk::gdk::Key::q | gtk::gdk::Key::Q if control => Action::Root,
                 gtk::gdk::Key::Up if control => Action::Weeks(-1),
@@ -327,17 +331,47 @@ impl App {
             };
 
             let response = app.state.borrow_mut().apply(action);
-
-            match response {
-                Response::Redraw => app.ui.borrow_mut().update(&app.state.borrow()),
-                Response::Hide => app.hide(),
-                Response::Ignored => return glib::Propagation::Proceed,
-            }
-
-            glib::Propagation::Stop
+            app.respond(response)
         });
 
         self.window.add_controller(keys);
+    }
+
+    /// Read the clipboard without blocking the key handler, then put what it holds in
+    /// the calculator.
+    ///
+    /// GDK's clipboard is asynchronous on Wayland because the data lives in another
+    /// process until it is asked for. The read therefore returns to the main loop and
+    /// comes back here as an action, exactly like a keystroke.
+    fn paste(&self) {
+        let app = self.clone();
+
+        glib::spawn_future_local(async move {
+            let clipboard = gtk::prelude::RootExt::display(&app.window).clipboard();
+
+            let text = match clipboard.read_text_future().await {
+                Ok(Some(text)) => text.to_string(),
+                Ok(None) => return,
+                Err(error) => {
+                    tracing::warn!("could not read the clipboard: {error}");
+                    return;
+                }
+            };
+
+            let response = app.state.borrow_mut().apply(Action::Paste(text));
+            app.respond(response);
+        });
+    }
+
+    /// Put whatever an action changed on screen, and tell GTK whether the key was used.
+    fn respond(&self, response: Response) -> glib::Propagation {
+        match response {
+            Response::Redraw => self.ui.borrow_mut().update(&self.state.borrow()),
+            Response::Hide => self.hide(),
+            Response::Ignored => return glib::Propagation::Proceed,
+        }
+
+        glib::Propagation::Stop
     }
 
     fn handle(&self, command: Command) {

@@ -9,7 +9,9 @@
 #![allow(clippy::expect_used)]
 
 use chrono::NaiveDate;
+use napkin_math::Cidr;
 use napkin_math::parser::{Expr, Op, ParseError, parse};
+use std::net::Ipv4Addr;
 
 fn num(n: f64) -> Expr {
     Expr::Number(n)
@@ -188,6 +190,41 @@ fn digits_that_are_not_a_day_are_rejected() {
     assert!(parse("2024-02-29").is_ok());
 }
 
+// CIDR ranges.
+
+fn cidr(address: [u8; 4], prefix: u8) -> Expr {
+    Expr::Cidr(Cidr::new(Ipv4Addr::from(address), prefix).expect("a valid prefix"))
+}
+
+#[test]
+fn a_dotted_quad_with_a_prefix_is_a_range() {
+    assert_eq!(ok("10.4.64.37/23"), cidr([10, 4, 64, 37], 23));
+    assert_eq!(ok("  10.4.64.37 / 23  "), cidr([10, 4, 64, 37], 23));
+
+    // An address with no prefix is the one address it names.
+    assert_eq!(ok("10.4.64.37"), cidr([10, 4, 64, 37], 32));
+}
+
+#[test]
+fn a_decimal_and_a_division_are_still_arithmetic() {
+    assert_eq!(ok("10.4"), num(10.4));
+    assert_eq!(ok("2.5/2"), bin(Op::Div, num(2.5), num(2.0)));
+}
+
+#[test]
+fn a_range_that_is_still_being_typed_is_incomplete() {
+    for input in ["10.4.6", "10.4.64.", "10.4.64.37/"] {
+        assert_eq!(error(input), ParseError::Incomplete, "for {input:?}");
+    }
+}
+
+#[test]
+fn a_range_that_cannot_exist_says_why() {
+    assert!(matches!(error("10.4.64.37/33"), ParseError::BadCidr(_)));
+    assert!(matches!(error("10.4.64.256/23"), ParseError::BadCidr(_)));
+    assert!(matches!(error("10.4.64.37/23/24"), ParseError::BadCidr(_)));
+}
+
 // What is still being typed, and what is wrong.
 
 #[test]
@@ -249,7 +286,7 @@ fn a_character_the_language_has_no_use_for_is_reported_with_its_place() {
 /// through a state the interface would complain about.
 #[test]
 fn no_prefix_of_a_valid_expression_is_ever_a_mistake() {
-    const VALID: [&str; 9] = [
+    const VALID: [&str; 10] = [
         "2+3*4",
         "  2  +  3  *  4  ",
         "13 usd in dkk",
@@ -259,6 +296,7 @@ fn no_prefix_of_a_valid_expression_is_ever_a_mistake() {
         "(2+3)*4",
         "-5 + 2,5",
         "13 usd in dkk",
+        "10.4.64.37/23",
     ];
 
     for input in VALID {

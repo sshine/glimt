@@ -205,6 +205,30 @@ fn backspacing_back_to_nothing_puts_the_answer_away() {
 }
 
 #[test]
+fn pasting_appends_what_the_clipboard_holds() {
+    let mut state = full();
+    type_in(&mut state, "10.4.64.");
+    assert_eq!(
+        state.apply(Action::Paste("37/23\n".to_owned())),
+        Response::Redraw
+    );
+
+    let bar = state.bar();
+    assert_eq!(bar.input, "10.4.64.37/23");
+    assert_eq!(
+        bar.answer.map(|answer| answer.text.as_str()),
+        Some("10.4.64.0 – 10.4.65.255, gateway 10.4.64.1")
+    );
+}
+
+#[test]
+fn pasting_nothing_changes_nothing() {
+    let mut state = full();
+    assert_eq!(state.apply(Action::Paste(String::new())), Response::Ignored);
+    assert_eq!(state.bar().input, "");
+}
+
+#[test]
 fn a_duration_paints_the_days_it_covers() {
     let mut state = full();
     type_in(&mut state, "today + 7 days");

@@ -6,6 +6,7 @@
 use chrono::{Datelike, NaiveDate};
 use glimt_cal::names;
 
+use crate::cidr::Cidr;
 use crate::value::Value;
 
 pub fn value(value: &Value) -> String {
@@ -16,6 +17,17 @@ pub fn value(value: &Value) -> String {
         }
         Value::Date(date) => day(*date),
         Value::Duration { days } => duration(*days),
+        Value::Cidr(cidr) => cidr_range(cidr),
+    }
+}
+
+/// The range on one line: first address, last address, and the gateway convention.
+pub fn cidr_range(cidr: &Cidr) -> String {
+    let range = format!("{} – {}", cidr.network(), cidr.broadcast());
+
+    match cidr.gateway() {
+        Some(gateway) => format!("{range}, gateway {gateway}"),
+        None => range,
     }
 }
 

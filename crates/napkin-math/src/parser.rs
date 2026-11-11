@@ -12,6 +12,7 @@
 
 use chrono::NaiveDate;
 
+use crate::cidr::{self, Cidr};
 use crate::lexer::{self, LexError, Spanned, Token};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -27,6 +28,8 @@ pub enum Expr {
     Number(f64),
     Date(NaiveDate),
     Today,
+    /// A whole-line IPv4 CIDR range, like `10.4.64.37/23`.
+    Cidr(Cidr),
     /// A number with a word after it: `13 usd`, `7 days`.
     Unit {
         value: Box<Expr>,
@@ -62,6 +65,8 @@ pub enum ParseError {
     BadDate {
         at: usize,
     },
+    /// A whole-line range that cannot be an IPv4 CIDR, like `10.4.64.37/33`.
+    BadCidr(String),
     Unlexable {
         at: usize,
         character: char,
@@ -84,6 +89,15 @@ const TODAY: &str = "today";
 const TODAY_DA: &str = "idag";
 
 pub fn parse(input: &str) -> Result<Expr, ParseError> {
+    // A dotted quad cannot go through the ordinary lexer, so a line that is only a
+    // range is recognized here. Anything else falls through and is read as usual.
+    match cidr::parse(input) {
+        cidr::Attempt::NotCidr => {}
+        cidr::Attempt::Incomplete => return Err(ParseError::Incomplete),
+        cidr::Attempt::Invalid(message) => return Err(ParseError::BadCidr(message)),
+        cidr::Attempt::Cidr(cidr) => return Ok(Expr::Cidr(cidr)),
+    }
+
     let tokens = lexer::lex(input)?;
 
     if tokens.is_empty() {

@@ -15,6 +15,7 @@ use scheme_rs::{
     value::{UnpackedValue, Value as SchemeValue},
 };
 
+use crate::cidr::Cidr;
 use crate::value::Value;
 
 const PRELUDE: &str = include_str!("prelude.scm");
@@ -139,6 +140,17 @@ fn read_value(value: &SchemeValue) -> Option<Value> {
         return Some(Value::Duration {
             days: as_number(parts.get(1)?)?.round() as i64,
         });
+    }
+
+    if symbol_is(tag, "cidr") {
+        let bits = as_number(parts.get(1)?)?.round();
+        let prefix = as_number(parts.get(2)?)?.round();
+
+        if !(0.0..=f64::from(u32::MAX)).contains(&bits) || !(0.0..=32.0).contains(&prefix) {
+            return None;
+        }
+
+        return Cidr::from_bits(bits as u32, prefix as u8).map(Value::Cidr);
     }
 
     None
