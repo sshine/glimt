@@ -134,6 +134,9 @@ pub const PAD: f32 = 32.0;
 /// calculator without taking any from the grid.
 pub const WEEK_HEADING_SIZE: f32 = 64.0;
 
+/// The release label in the top right, quieter than the week it sits beside.
+pub const VERSION_SIZE: f32 = 11.0;
+
 pub const SQUARE: f32 = 92.0;
 pub const SQUARE_GAP: f32 = 10.0;
 pub const SQUARE_RADIUS: f32 = 10.0;

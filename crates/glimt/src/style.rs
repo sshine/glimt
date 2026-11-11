@@ -29,6 +29,7 @@ pub fn sheet(palette: &Palette) -> String {
 
     let font = theme::FONT;
     let heading = theme::WEEK_HEADING_SIZE;
+    let version = theme::VERSION_SIZE;
     let initial = theme::SQUARE_INITIAL_SIZE;
     let number = theme::SQUARE_NUMBER_SIZE;
     let month_heading = theme::MONTH_HEADING_SIZE;
@@ -54,6 +55,7 @@ window.glimt {{ background-color: {background}; font-family: {font}; }}
 .glimt-root  {{ background-color: {background}; color: {ink}; padding: {pad}px; }}
 
 .week-heading {{ font-size: {heading}px; font-weight: 800; color: {ink}; }}
+.version      {{ font-size: {version}px; color: {muted}; }}
 
 .day          {{ border-radius: {radius}px; }}
 .day-initial  {{ font-size: {initial}px; font-weight: 700; letter-spacing: 1px; }}

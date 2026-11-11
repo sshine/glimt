@@ -194,7 +194,15 @@ fn build_strip(overview: &Overview) -> (gtk::Box, Vec<Square>, gtk::Label) {
     heading.set_margin_start(28);
     heading.set_valign(gtk::Align::Center);
 
+    // The release this build came from, in the corner the eye leaves last.
+    let version = gtk::Label::new(Some(&format!("v{}", env!("CARGO_PKG_VERSION"))));
+    version.add_css_class("version");
+    version.set_hexpand(true);
+    version.set_xalign(1.0);
+    version.set_valign(gtk::Align::Center);
+
     strip.append(&heading);
+    strip.append(&version);
 
     (strip, squares, heading)
 }
