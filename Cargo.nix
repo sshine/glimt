@@ -3757,7 +3757,7 @@ rec {
       };
       "glimt" = rec {
         crateName = "glimt";
-        version = "0.3.0";
+        version = "0.4.0";
         edition = "2024";
         crateBin = [
           {
@@ -3820,7 +3820,7 @@ rec {
       };
       "glimt-bench" = rec {
         crateName = "glimt-bench";
-        version = "0.3.0";
+        version = "0.4.0";
         edition = "2024";
         crateBin = [
           {
@@ -3868,7 +3868,7 @@ rec {
       };
       "glimt-cal" = rec {
         crateName = "glimt-cal";
-        version = "0.3.0";
+        version = "0.4.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/glimt-cal; };
         libName = "glimt_cal";
@@ -3885,7 +3885,7 @@ rec {
       };
       "glimt-proto" = rec {
         crateName = "glimt-proto";
-        version = "0.3.0";
+        version = "0.4.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/glimt-proto; };
         libName = "glimt_proto";
@@ -3906,7 +3906,7 @@ rec {
       };
       "glimt-shell" = rec {
         crateName = "glimt-shell";
-        version = "0.3.0";
+        version = "0.4.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/glimt-shell; };
         libName = "glimt_shell";
@@ -3966,7 +3966,7 @@ rec {
       };
       "glimtctl" = rec {
         crateName = "glimtctl";
-        version = "0.3.0";
+        version = "0.4.0";
         edition = "2024";
         crateBin = [
           {
@@ -5498,7 +5498,7 @@ rec {
       };
       "napkin-math" = rec {
         crateName = "napkin-math";
-        version = "0.3.0";
+        version = "0.4.0";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./crates/napkin-math; };
         libName = "napkin_math";

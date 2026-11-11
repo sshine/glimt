@@ -1152,7 +1152,7 @@ dependencies = [
 
 [[package]]
 name = "glimt"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-channel",
@@ -1169,7 +1169,7 @@ dependencies = [
 
 [[package]]
 name = "glimt-bench"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -1182,14 +1182,14 @@ dependencies = [
 
 [[package]]
 name = "glimt-cal"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "chrono",
 ]
 
 [[package]]
 name = "glimt-proto"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "libc",
  "serde",
@@ -1197,7 +1197,7 @@ dependencies = [
 
 [[package]]
 name = "glimt-shell"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1214,7 +1214,7 @@ dependencies = [
 
 [[package]]
 name = "glimtctl"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -1693,7 +1693,7 @@ dependencies = [
 
 [[package]]
 name = "napkin-math"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "chrono",
  "glimt-cal",
